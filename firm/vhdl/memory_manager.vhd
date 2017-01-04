@@ -12,8 +12,8 @@ ENTITY MEMORY_MANAGER IS
 		DATA3_I			: IN 	STD_LOGIC_VECTOR(15 downto 0);
 		DATA4_O			: OUT	STD_LOGIC_VECTOR(15 downto 0);
 		DATA5_O			: OUT 	STD_LOGIC_VECTOR(15 downto 0);
-		DATA6_O			: OUT 	STD_LOGIC_VECTOR(15 downto 0);
-		DATA7_O			: OUT 	STD_LOGIC_VECTOR(15 downto 0);
+		DATA6_O			: OUT	STD_LOGIC_VECTOR(15 downto 0);
+		DATA7_O			: OUT 	STD_LOGIC_VECTOR(15 downto 0);		
 		MEMADD_I		: IN 	STD_LOGIC_VECTOR(2 downto 0);
 		MEMDATA_I		: IN	STD_LOGIC_VECTOR(15 downto 0);
 		MEMDATA_O		: OUT	STD_LOGIC_VECTOR(15 downto 0);
@@ -35,7 +35,7 @@ ARCHITECTURE BEHAVIOR OF MEMORY_MANAGER IS
 			DATA4_O <= (OTHERS => '0');
 			DATA5_O <= (OTHERS => '0');
 			DATA6_O <= (OTHERS => '0');
-			DATA7_O <= (OTHERS => '0');
+			DATA7_O <= (OTHERS => '0');			
 			en_latched <= '0';
 		ELSIF( rising_edge(CLK_I) ) THEN
 			en_latched	<= EN_I;
@@ -70,12 +70,12 @@ ARCHITECTURE BEHAVIOR OF MEMORY_MANAGER IS
 					MEMDATA_O <= (OTHERS => '0');
 					IF (RW_I='1' and en_latched='0' and EN_I='1')THEN
 						DATA6_O <= MEMDATA_I(15 DOWNTO 0);
-					END IF;
+					END IF;	
 				WHEN "111" =>
 					MEMDATA_O <= (OTHERS => '0');
 					IF (RW_I='1' and en_latched='0' and EN_I='1')THEN
 						DATA7_O <= MEMDATA_I(15 DOWNTO 0);
-					END IF;
+					END IF;					
 				WHEN OTHERS => NULL;
 			END CASE;
 		END IF;
