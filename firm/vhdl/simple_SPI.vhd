@@ -24,9 +24,11 @@ ARCHITECTURE BEHAVIORAL OF SIMPLE_SPI IS
 	SIGNAL index				: NATURAL RANGE 0 TO 15;
 	SIGNAL tx_data 				: STD_LOGIC_VECTOR(15 DOWNTO 0);
 	SIGNAL sclk_latched 		: STD_LOGIC;
+	SIGNAL sclk_buffered 		: STD_LOGIC;
 	SIGNAL ss_latched 			: STD_LOGIC;
 	SIGNAL mosi_latched			: STD_LOGIC;
 	SIGNAL tx_load_latched		: STD_LOGIC;
+	SIGNAL tx_load_buffered		: STD_LOGIC;
 	
 	BEGIN
 	
@@ -34,50 +36,41 @@ ARCHITECTURE BEHAVIORAL OF SIMPLE_SPI IS
 		BEGIN
 			IF(RESET_i = '1') THEN
 				rx_data <= (OTHERS => '0');
-				index <= 15;
+				index <= 0;
 				tx_data <= (OTHERS => '0');
-				IRQ_O <= '0';
+				IRQ_O <= '1';
 				sclk_latched <= '0';
+				sclk_buffered <= '0';
 				ss_latched <= '0';
 				mosi_latched <= '0';
 				tx_load_latched <= '0';
 			ELSIF( rising_edge(CLK_I) ) THEN
 				sclk_latched <= SCLK_I;
+				sclk_buffered <= sclk_latched;
 				ss_latched <= SS_I;
 				mosi_latched <= MOSI_i;
 				tx_load_latched <= TX_LOAD_I;
-
-				IF(tx_load_latched = '0' and TX_LOAD_I = '1') then
-					tx_data <= DATA_TO_TX_O;
-				END IF;
+				tx_load_buffered <= tx_load_latched;
 				
-				IF (ss_latched = '1' and SS_I = '0') THEN
-					index <= 15;
-					IRQ_O <= '0';
+				IF(tx_load_buffered = '0' and tx_load_latched = '1') THEN
+					tx_data <= DATA_TO_TX_O;
 				END IF;
 
 				IF( ss_latched = '0' ) THEN
-					IF(sclk_latched = '0' and SCLK_i = '1') THEN
+					IF(sclk_buffered = '0' and sclk_latched = '1') THEN
+						IRQ_O <= '0';
 						rx_data <= rx_data(14 DOWNTO 0) & mosi_latched;
-						IF( index = 15 ) THEN
-							index <= 0;
-							IRQ_O <= '0';
-						ELSE
-							index <= index+1;
-						END IF;
-					END IF;
-					IF(sclk_latched = '1' and SCLK_i = '0') THEN
+					ELSIF(sclk_buffered = '1' and sclk_latched = '0') THEN
 						tx_data <= tx_data(14 DOWNTO 0) & '0';
-						IF( index = 15 ) THEN
-							IRQ_O <= '1';
-						END IF;
 					END IF;
+				ELSE
+					IRQ_O <= '1';
 				END IF;
 			END IF;
 	END PROCESS;
 
 -- Combinational assignments
-	MISO_O <= tx_data(7);
+	MISO_O <= tx_data(15);
 	RX_DATA_O <= rx_data;
 	
 END BEHAVIORAL;
