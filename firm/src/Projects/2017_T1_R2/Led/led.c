@@ -18,6 +18,9 @@
 /* Inclusion */
 #include "main.h"
 
+static const char * const welcomeMessage  = WELCOME_MESSAGE;
+
+
 /* Local Variable Mutex */
 static xSemaphoreHandle xLedColorMutex;
 static xSemaphoreHandle xLedModeMutex;
@@ -48,6 +51,9 @@ static void OS_LedTask( void *pvParameters )
 
     /* Remove compiler warning about unused parameter. */
     ( void ) pvParameters;
+
+    /* Send the welcome message. */
+    //serial_puts(welcomeMessage);
 
     for( ;; )
     {

@@ -69,6 +69,26 @@
 /* Project files */
 #include "hardware_const.h"
 
+
+ /**
+ ********************************************************************************
+ **
+ **  The welcome message display at shell's startup
+ **
+ ********************************************************************************
+ */
+#define AT_COMMAND "AT+BAUD8"
+#define WELCOME_MESSAGE "\f"\
+   "-----------------------------------------------------------\n\r"\
+   "  IgreBot "YEAR_STR" ~ Command Shell\n\r"\
+   "-----------------------------------------------------------\n\r"\
+   "  Robot : "ROBOT_NAME_STR"\n\r"\
+   "  Build : "BUILD_VERSION_STR"\n\r"\
+   "-----------------------------------------------------------\n\r"\
+   " Type 'help' for the list of available commands\n\r"\
+   "-----------------------------------------------------------\n\r\n\r"\
+   "> "
+
 /**
 ********************************************************************************
 **
@@ -81,13 +101,33 @@
  * OS Tasks Priorities.
  * Higher value means higher priority
  */
-#define OS_TASK_PRIORITY_LED          ( tskIDLE_PRIORITY + 2)
-
+#define OS_TASK_PRIORITY_LED          ( tskIDLE_PRIORITY + 2 )
+#define OS_TASK_PRIORITY_MOTION_CS    ( tskIDLE_PRIORITY + 4 )
 /*
  * OS Tasks Stacks sizes, in bytes
  */
 #define OS_TASK_STACK_LED               configMINIMAL_STACK_SIZE
+#define OS_TASK_STACK_MOTION_CS         500
 
+ /* NVIC Priorities. Lower value means higher priority.
+  * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY
+  * and higher than configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY when using
+  * ISR Save FreeRTOS API Routines!
+  */
+#define OS_ISR_PRIORITY_SER             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 )
+
+ /*
+  * Events periodicity
+  */
+#define MOTION_CONTROL_PERIOD_MS      100
+
+/**
+********************************************************************************
+**
+**  Prototypes
+**
+********************************************************************************
+*/
 
 /*
  * -----------------------------------------------------------------------------
@@ -115,7 +155,21 @@ BaseType_t led_start(void);
 void led_set_mode(HB_LED_ModeTypeDef mode);
 void led_set_color(HB_LED_ColorTypeDef color);
 
+/* Serial Interface */
+BaseType_t serial_init(void);
+BaseType_t serial_put(char ch);
+BaseType_t serial_puts(const char* str);
+BaseType_t serial_get(const char* str);
+int serial_printf(const char * restrict format, ... );
 
+/*
+ * -----------------------------------------------------------------------------
+ * Sub-Systems
+ * -----------------------------------------------------------------------------
+ */
+
+/* Motion Control System */
+BaseType_t motion_cs_start(void);
 
 #ifdef __cplusplus
 }

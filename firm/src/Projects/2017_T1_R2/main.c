@@ -28,11 +28,14 @@
 int main( void )
 {
 
-  /* HoloBoard Initializations */
+  /* HoloBoard Initializations */;
   hb_init();
 
-  led_start();
+  // Serial is started first to ensure correct print outs
+  serial_init();
 
+  led_start();
+  motion_cs_start();
 
   /* Start FreeRTOS Scheduler */
   vTaskStartScheduler();

@@ -106,9 +106,16 @@ uint32_t hb_sys_timer_get_run_time_ticks(void);
 void hb_led_init(void);
 void hb_led_set_color(HB_LED_ColorTypeDef color);
 
-/* Digital I/Os */
-void hb_dio_init(void);
+/* FPGA LCMXO2 */
+void hb_lcmxo2_init(void);
+uint16_t hb_lcmxo2_tx_rx(uint16_t value);
+void hb_lcmxo2_set_pwm(uint16_t motor, int16_t value);
+int16_t hb_lcmxo2_get_qei(uint16_t encoder);
 
+/* Debug Interface */
+void hb_dbg_init(USART_InitTypeDef * USART_InitStruct);
+void hb_dbg_enable(uint32_t nvic_priority);
+void hb_dbg_disable(void);
 
 #ifdef __cplusplus
 }

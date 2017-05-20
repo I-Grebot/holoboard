@@ -36,4 +36,23 @@
 #define LED_BLINK_SLOW          100
 #define LED_BLINK_FAST           10
 
+/**
+********************************************************************************
+**
+**  Serial Interface
+**
+********************************************************************************
+*/
+
+#define SERIAL_BAUDRATE         115200
+
+#define SERIAL_ISR              DBG_ISR
+#define SERIAL_COM              DBG_COM
+
+#define SERIAL_RX_QUEUE_LEN     64
+#define SERIAL_TX_QUEUE_LEN    256 // That's only because we like to transmit
+
+#define SERIAL_RX_TIMEOUT      pdMS_TO_TICKS( 10 )
+#define SERIAL_TX_TIMEOUT      pdMS_TO_TICKS( 10 )
+
 #endif /* __HARDWARE_CONST_H */

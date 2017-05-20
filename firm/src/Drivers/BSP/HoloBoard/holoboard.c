@@ -48,6 +48,7 @@ void hb_init(void)
 
     /* Modules without custom-configuration */
     hb_led_init();
+    hb_lcmxo2_init();
 
     /* Set Interrupt group priority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
