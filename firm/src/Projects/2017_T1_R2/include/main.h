@@ -119,7 +119,7 @@
  /*
   * Events periodicity
   */
-#define MOTION_CONTROL_PERIOD_MS      100
+#define MOTION_CONTROL_PERIOD_MS      20
 
 /**
 ********************************************************************************
@@ -170,7 +170,7 @@ int serial_printf(const char * restrict format, ... );
 
 /* Motion Control System */
 BaseType_t motion_cs_start(void);
-
+void motor1_set_speed(int speed);
 #ifdef __cplusplus
 }
 #endif
