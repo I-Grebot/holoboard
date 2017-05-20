@@ -7,8 +7,6 @@ elec/src/Project Outputs for holoboard/
 
 elec/src/holoboard\.Dat
 
-firm/\.settings/
-
 firm/vhdl/holoboard_tcr\.dir/
 
 firm/vhdl/testbenchs/PWM_testbench/PWM_testbench/
@@ -27,9 +25,6 @@ firm/vhdl/testbenchs/PWM_testbench/PWM_testbench\.adf
 
 firm/holoboard\.elf\.launch
 
-firm/\.project
-
-firm/\.cproject
 
 *.ini
 
