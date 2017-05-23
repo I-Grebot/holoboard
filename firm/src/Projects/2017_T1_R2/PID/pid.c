@@ -57,7 +57,9 @@ safe_setpwm(void (*f)(void *, int32_t), void * param, int32_t value)
 	void * param_tmp;
 	f_tmp = f;
 	param_tmp = param;
-	if (f_tmp) {
+
+	if (f_tmp)
+	{
 		f_tmp(param_tmp, value);
 	}
 }
@@ -69,9 +71,12 @@ safe_getencoder(int32_t (*f)(void *), void * param)
 	void * param_tmp;
 	f_tmp = f;
 	param_tmp = param;
-	if (f_tmp) {
+
+	if (f_tmp)
+	{
 		return f_tmp(param_tmp);
 	}
+
 	return 0;
 }
 
@@ -89,11 +94,13 @@ int32_t PID_Process(PID_struct_t *PID, int32_t error){
         if(PID->err_I > PID->I_limit)
         {
             PID->err_I = PID->I_limit;
-        }else if(PID->err_I < -PID->I_limit)
+        }
+        else if(PID->err_I < -PID->I_limit)
         {
             PID->err_I = -PID->I_limit;
         }
     }
+
     command = PID->err*PID->KP + PID->err_I*PID->KI/100 - err_D*PID->KD;
 
     return command;
@@ -110,25 +117,27 @@ void PID_Process_Speed(PID_process_t *sPID, uint32_t position){
     // Speed saturation
     if(sPID->speed_Limit)
     {
-	if (command > sPID->speed_Limit)
-	{
+    	if (command > sPID->speed_Limit)
+    	{
             command = sPID->speed_Limit;
-        }else if (command < - sPID->speed_Limit)
-	{
+        }
+    	else if (command < - sPID->speed_Limit)
+    	{
             command = - sPID->speed_Limit;
-	}
+    	}
     }
 
     // Acceleration saturation
     if(sPID->acceleration_Limit)
     {
         if ( (command - sPID->last_ref) > sPID->acceleration_Limit)
-	{
+        {
             command = sPID->last_ref + sPID->acceleration_Limit;
-	}else if (  (sPID->last_ref - command )  >  sPID->acceleration_Limit )
-	{
+        }
+        else if (  (sPID->last_ref - command )  >  sPID->acceleration_Limit )
+        {
             command = sPID->last_ref - sPID->acceleration_Limit;
-	}
+        }
     }
 
     // Send new motor reference
@@ -150,27 +159,28 @@ void PID_Process_Position(PID_process_t *pPID, PID_process_t *sPID, int32_t posi
     // Speed saturation
     if(pPID->speed_Limit)
     {
-	if (ref_speed > pPID->speed_Limit)
-	{
+    	if (ref_speed > pPID->speed_Limit)
+    	{
             ref_speed = pPID->speed_Limit;
-        }else if (ref_speed < - pPID->speed_Limit)
-	{
+        }
+    	else if (ref_speed < - pPID->speed_Limit)
+    	{
             ref_speed = - pPID->speed_Limit;
-	}
+    	}
     }
 	
     // Acceleration saturation
     if(pPID->acceleration_Limit)
     {
         if ( (ref_speed - pPID->last_ref) > pPID->acceleration_Limit)
-	{
+        {
             ref_speed = pPID->last_ref + pPID->acceleration_Limit;
-	}else if (  (pPID->last_ref - ref_speed )  >  pPID->acceleration_Limit )
-	{
+        }
+        else if (  (pPID->last_ref - ref_speed )  >  pPID->acceleration_Limit )
+        {
             ref_speed = pPID->last_ref - pPID->acceleration_Limit;
-	}
+        }
     }
-
     
     if (sPID != NULL)
     {

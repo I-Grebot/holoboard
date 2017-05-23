@@ -62,23 +62,25 @@ BaseType_t serial_put(char ch)
      * the line is idle so we can initiate directly the transmission.
      */
     if((uxQueueMessagesWaiting(Serial_TxQueue) == 0) &&
-       (USART_GetFlagStatus(SERIAL_COM, USART_FLAG_TXE) == SET)) {
-
+       (USART_GetFlagStatus(SERIAL_COM, USART_FLAG_TXE) == SET))
+    {
         USART_ITConfig(SERIAL_COM, USART_IT_TC, ENABLE);
         USART_SendData(SERIAL_COM, (uint16_t) ch);
 
         return pdPASS;
-
+    }
     /* Otherwise, at least 1 transmission is pending,
      * so we add it the the transmit queue.
      */
-    } else {
-
+    else
+    {
         if(xQueueSend(Serial_TxQueue, &ch, SERIAL_TX_TIMEOUT) == pdPASS)
         {
             USART_ITConfig(SERIAL_COM, USART_IT_TC, ENABLE);
             return pdPASS;
-        } else {
+        }
+        else
+        {
             return pdFAIL;
         }
     }
@@ -94,9 +96,12 @@ BaseType_t serial_puts(const char* str)
 {
     while (*str)
     {
-        if((serial_put(*str)) == pdPASS) {
+        if((serial_put(*str)) == pdPASS)
+        {
             str++;
-        } else {
+        }
+        else
+        {
             return pdFAIL;
         }
     }
@@ -134,9 +139,7 @@ void SERIAL_ISR (void)
 
         // Put the received char into the Rx Queue
         xQueueSendFromISR(Serial_RxQueue, &rxChar, &xHigherPriorityTaskWoken);
-
     }
-
     // Handle TX Interrupt
     else if(USART_GetITStatus(SERIAL_COM, USART_IT_TC) != RESET)
     {
@@ -156,7 +159,6 @@ void SERIAL_ISR (void)
             // Nothing to send! Disable back the ISR
             USART_ITConfig(SERIAL_COM, USART_IT_TC, DISABLE);
         }
-
     }
 }
 

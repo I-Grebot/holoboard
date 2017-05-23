@@ -74,10 +74,12 @@ static void OS_LedTask( void *pvParameters )
 
         /* Handles blinking counter */
         if(blinkCounter++ > blinkPeriod)
-            blinkCounter = 0;
+        {
+        	blinkCounter = 0;
+        }
 
-        if((blinkCounter > blinkPeriod / 2) || LedMode == HB_LED_STATIC) {
-
+        if((blinkCounter > blinkPeriod / 2) || LedMode == HB_LED_STATIC)
+        {
             /* Duration ON */
             hb_led_set_color(LedColor);
             vTaskDelayUntil( &xNextWakeTime, LED_PWM_DUTY_TICK);
@@ -85,8 +87,9 @@ static void OS_LedTask( void *pvParameters )
             /* Duration OFF */
             hb_led_set_color(HB_LED_OFF);
             vTaskDelayUntil( &xNextWakeTime, LED_PWM_PERIOD_TICK-LED_PWM_DUTY_TICK);
-
-        } else {
+        }
+        else
+        {
             vTaskDelayUntil( &xNextWakeTime, LED_PWM_PERIOD_TICK);
         }
     }

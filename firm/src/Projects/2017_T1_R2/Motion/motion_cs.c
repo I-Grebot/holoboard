@@ -78,6 +78,10 @@ int32_t encoder_get_position(uint16_t QEI)
 	int16_t encoder;
 	int16_t delta;
 
+	int32_t output;
+
+	output = 0;
+
 	encoder = hb_lcmxo2_get_qei(QEI)*16;
 	switch(QEI)
 	{
@@ -85,24 +89,25 @@ int32_t encoder_get_position(uint16_t QEI)
 	   	delta = encoder - encoder1_Old;
 	    encoder1_Old = encoder;
 	    encoder1_Value += (int32_t)delta/16;
-	    return encoder1_Value;
+	    output = encoder1_Value;
 	    break;
 	case ENCODER2:
 	   	delta = encoder - encoder2_Old;
 	    encoder2_Old = encoder;
 	    encoder2_Value += (int32_t)delta/16;
-	    return encoder2_Value;
+	    output = encoder2_Value;
 	    break;
 	case ENCODER3:
 	   	delta = encoder - encoder3_Old;
 	    encoder3_Old = encoder;
 	    encoder3_Value += (int32_t)delta/16;
-	    return encoder3_Value;
+	    output = encoder3_Value;
 	    break;
 	default :
-		return 0;
+		output = 0;
 	}
-	return 0;
+
+	return output;
 }
 
 
@@ -114,27 +119,45 @@ int32_t encoder_get_position(uint16_t QEI)
 void motor1_set_speed(int speed)
 {
 	if(speed >= MAX_SPEED)
+	{
 		speed = MAX_SPEED;
+	}
+
 	if(speed <= -MAX_SPEED)
+	{
 		speed = -MAX_SPEED;
+	}
+
 	hb_lcmxo2_set_pwm(MOTOR1, speed);
 }
 
 void motor2_set_speed(int speed)
 {
 	if(speed >= MAX_SPEED)
+	{
 		speed = MAX_SPEED;
+	}
+
 	if(speed <= -MAX_SPEED)
+	{
 		speed = -MAX_SPEED;
+	}
+
 	hb_lcmxo2_set_pwm(MOTOR2, speed);
 }
 
 void motor3_set_speed(int speed)
 {
 	if(speed >= MAX_SPEED)
+	{
 		speed = MAX_SPEED;
+	}
+
 	if(speed <= -MAX_SPEED)
+	{
 		speed = -MAX_SPEED;
+	}
+
 	hb_lcmxo2_set_pwm(MOTOR3, speed);
 }
 
@@ -179,15 +202,18 @@ void motion_cs_task(void *pvParameters)
 {
   TickType_t xNextWakeTime;
   PID_process_t *pPID_1, *pPID_2, *pPID_3;
-  int32_t posx=0,posy=3700,posteta=0;
+
   uint16_t timer=0;
-  char str[60];
+
   /* Initialise xNextWakeTime - this only needs to be done once. */
   xNextWakeTime = xTaskGetTickCount();
-  /* Wait for 1s to let lcmxo2 startup*/
+
+  /* Wait for 1s to let lcmxo2 startup */
   vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS*10);
   LCMXO2_RESET_WRITE(LCMXO2_RESET_OFF);
   vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS*10);
+
+  /* Init motors and PID */
   motor1_set_speed(0);
   motor2_set_speed(0);
   motor3_set_speed(0);
@@ -203,13 +229,16 @@ void motion_cs_task(void *pvParameters)
   PID_Set_Coefficient(pPID_1->PID,1,0,0,0);
   PID_Set_Coefficient(pPID_2->PID,1,0,0,0);
   PID_Set_Coefficient(pPID_3->PID,1,0,0,0);
-  PID_Set_limitation(pPID_1,500,75 );
+
+  /* Init PID limitation */
+  PID_Set_limitation(pPID_1,500,75);
   PID_Set_limitation(pPID_2,500,75);
   PID_Set_limitation(pPID_3,500,20);
 
   PID_Set_Ref_Position(pPID_1,0);//7600);
   PID_Set_Ref_Position(pPID_2,3700);
   PID_Set_Ref_Position(pPID_3,0);//-4790);
+
   /* Remove compiler warning about unused parameter. */
   ( void ) pvParameters;
 
@@ -217,14 +246,17 @@ void motion_cs_task(void *pvParameters)
   {
 	  PID_Process_holonomic(pPID_1,pPID_2,pPID_3);
 	  timer++;
+
 	  if(timer==100)
 	  {
 		  PID_Set_Ref_Position(pPID_1,3900);
 	  }
+
 	  if(timer==200)
 	  {
 		  PID_Set_Ref_Position(pPID_2,0);
 	  }
+
 	  if(timer==300)
 	  {
 		  PID_Set_Ref_Position(pPID_1,0);
