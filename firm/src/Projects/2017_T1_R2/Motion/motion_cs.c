@@ -179,10 +179,7 @@ void motion_cs_task(void *pvParameters)
 {
   TickType_t xNextWakeTime;
   PID_process_t *pPID_1, *pPID_2, *pPID_3;
-  int32_t speed_motor1=0, speed_motor2=0, speed_motor3=0;
-  int32_t motor1_pos=0, motor2_pos=0, motor3_pos=0;
-  int32_t posx=0,posy=0,posteta=0;
-  int32_t speed_x=0, speed_y=0, speed_teta=0;
+  int32_t posx=0,posy=3700,posteta=0;
   uint16_t timer=0;
   char str[60];
   /* Initialise xNextWakeTime - this only needs to be done once. */
@@ -206,8 +203,8 @@ void motion_cs_task(void *pvParameters)
   PID_Set_Coefficient(pPID_1->PID,1,0,0,0);
   PID_Set_Coefficient(pPID_2->PID,1,0,0,0);
   PID_Set_Coefficient(pPID_3->PID,1,0,0,0);
-  PID_Set_limitation(pPID_1,1000,75 );
-  PID_Set_limitation(pPID_2,1000,75);
+  PID_Set_limitation(pPID_1,500,75 );
+  PID_Set_limitation(pPID_2,500,75);
   PID_Set_limitation(pPID_3,500,20);
 
   PID_Set_Ref_Position(pPID_1,0);//7600);
@@ -219,47 +216,20 @@ void motion_cs_task(void *pvParameters)
   for( ;; )
   {
 	  PID_Process_holonomic(pPID_1,pPID_2,pPID_3);
-	  //timer++;
-	/*  if(timer==100)
+	  timer++;
+	  if(timer==100)
 	  {
-		  speed_y=2800;
-		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
-		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
-		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
-		  PID_Set_Ref_Position(pPID_1,speed_motor1);
-		  PID_Set_Ref_Position(pPID_2,speed_motor2);
-		  PID_Set_Ref_Position(pPID_3,speed_motor3);
+		  PID_Set_Ref_Position(pPID_1,3900);
 	  }
 	  if(timer==200)
 	  {
-		  speed_x=0;
-		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
-		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
-		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
-		  PID_Set_Ref_Position(pPID_1,speed_motor1);
-		  PID_Set_Ref_Position(pPID_2,speed_motor2);
-		  PID_Set_Ref_Position(pPID_3,speed_motor3);
+		  PID_Set_Ref_Position(pPID_2,0);
 	  }
 	  if(timer==300)
 	  {
-		  speed_y=0;
-		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
-		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
-		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
-		  PID_Set_Ref_Position(pPID_1,speed_motor1);
-		  PID_Set_Ref_Position(pPID_2,speed_motor2);
-		  PID_Set_Ref_Position(pPID_3,speed_motor3);
+		  PID_Set_Ref_Position(pPID_1,0);
 	  }
-	  if(timer==400)
-	  {
-		  speed_teta=500;
-		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
-		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
-		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
-		  PID_Set_Ref_Position(pPID_1,speed_motor1);
-		  PID_Set_Ref_Position(pPID_2,speed_motor2);
-		  PID_Set_Ref_Position(pPID_3,speed_motor3);
-	  }*/
+
 	  // sprintf(str,"dummy3=%u \t old_dummy3=%u \t delta3=%u\n\r",dummy3, old_dummy3, (dummy3-old_dummy3)&0x0FFF);
 	  //serial_puts(str);
 	  /* Wakes-up when required */
