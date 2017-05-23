@@ -62,9 +62,17 @@ safe_setpwm(void (*f)(void *, int32_t), void * param, int32_t value)
 	}
 }
 
-void dc_motor_set_speed(uint8_t channel, int16_t speed)
+static inline int32_t
+safe_getencoder(int32_t (*f)(void *), void * param)
 {
-	motor1_set_speed(speed);
+	int32_t (*f_tmp)(void *);
+	void * param_tmp;
+	f_tmp = f;
+	param_tmp = param;
+	if (f_tmp) {
+		return f_tmp(param_tmp);
+	}
+	return 0;
 }
 
 int32_t PID_Process(PID_struct_t *PID, int32_t error){
@@ -178,6 +186,57 @@ void PID_Process_Position(PID_process_t *pPID, PID_process_t *sPID, int32_t posi
     }
 }
 
+void PID_Process_holonomic(PID_process_t *pPIDx,PID_process_t *pPIDy,PID_process_t *pPIDteta)
+{
+    int32_t ref_speedx=0,ref_speedy=0,ref_speedteta=0;
+    int32_t motor1_pos,motor2_pos,motor3_pos;
+    int32_t motor1_speed,motor2_speed,motor3_speed;
+    int32_t posx=0, posy=0, posteta=0;
+    char str[60];
+
+    motor1_pos = safe_getencoder(pPIDx->get_encoder,pPIDx->encoder_Channel);
+    motor2_pos = safe_getencoder(pPIDy->get_encoder,pPIDy->encoder_Channel);
+    motor3_pos = safe_getencoder(pPIDteta->get_encoder,pPIDteta->encoder_Channel);
+
+    // Compute current position
+    posx = (int32_t)(motor1_pos*-0.4553 + motor2_pos*0.3333 + motor3_pos*0.1220);
+    posy = (int32_t)(motor1_pos*-0.1220 + motor2_pos*-0.3333 + motor3_pos*0.4553);
+    posteta = (int32_t)(motor1_pos*-0.028 + motor2_pos*-0.028 + motor3_pos*-0.028);
+
+	sprintf(str,"Posx=%i \t Posy=%i \t Posteta=%i \n\r",posx, posy, posteta);
+	serial_puts(str);
+
+    // Compute position errors
+    ref_speedx = PID_Process(pPIDx->PID, pPIDx->ref - posx);
+    ref_speedx = PID_Manage_limitation(pPIDx, ref_speedx);
+    ref_speedy = PID_Process(pPIDy->PID, pPIDy->ref - posy);
+    ref_speedy = PID_Manage_limitation(pPIDy, ref_speedy);
+    ref_speedteta = PID_Process(pPIDteta->PID, pPIDteta->ref - posteta);
+    ref_speedteta = PID_Manage_limitation(pPIDteta, ref_speedteta);
+
+    motor1_speed = (int32_t)(ref_speedx*-1.366 + ref_speedy*-0.366 + ref_speedteta*-12.0115);
+    motor2_speed = (int32_t)(ref_speedx*1 + ref_speedy*-1 + ref_speedteta*-12.0115);
+    motor3_speed = (int32_t)(ref_speedx*0.366 + ref_speedy*1.366 + ref_speedteta*-12.0115);
+
+    if(motor1_speed >= 1000)
+    	motor1_speed = 1000;
+    if(motor1_speed <= -1000)
+    	motor1_speed = -1000;
+    if(motor2_speed >= 1000)
+    	motor2_speed = 1000;
+    if(motor2_speed <= -1000)
+    	motor2_speed = -1000;
+    if(motor3_speed >= 1000)
+    	motor3_speed = 1000;
+    if(motor3_speed <= -1000)
+    	motor3_speed = -1000;
+
+    // Send new motor reference
+    safe_setpwm(pPIDx->set_pwm, pPIDx->pwm_channel,(int16_t)motor1_speed);
+    safe_setpwm(pPIDy->set_pwm, pPIDy->pwm_channel,(int16_t)motor2_speed);
+    safe_setpwm(pPIDteta->set_pwm, pPIDteta->pwm_channel,(int16_t)motor3_speed);
+}
+
 void PID_Set_Coefficient(PID_struct_t *PID,int8_t KP,int8_t KI,int8_t KD,uint32_t I_limit){
     // Set coefficients
     PID->KP = KP;
@@ -204,21 +263,59 @@ void PID_Set_limitation(PID_process_t *xPID,int32_t S_limit, int32_t A_limit){
     // Set Saturations
     xPID->speed_Limit = S_limit;
     xPID->acceleration_Limit = A_limit;
+    xPID->last_ref = 0;
 }
 
-PID_process_t* pid_init(void (*set_pwm)(void *, int32_t), void *pwm_channel,uint8_t E_channel,uint8_t use_QEI){
+int32_t PID_Manage_limitation(PID_process_t *xPID, int32_t param){
+	int32_t value;
+	value = param;
+
+	    // Speed saturation
+	    if(xPID->speed_Limit)
+	    {
+			if ( value > xPID->speed_Limit)
+			{
+				value = xPID->speed_Limit;
+			}
+			else if (value < -xPID->speed_Limit)
+			{
+				value = -xPID->speed_Limit;
+			}
+	    }
+
+	    // Acceleration saturation
+	    if(xPID->acceleration_Limit)
+	    {
+	        if ( (value - xPID->last_ref) > xPID->acceleration_Limit)
+	        {
+	        	value = xPID->last_ref + xPID->acceleration_Limit;
+	        }
+	        else if (  (xPID->last_ref - value )  >  xPID->acceleration_Limit )
+	        {
+	        	value = xPID->last_ref - xPID->acceleration_Limit;
+	        }
+	    }
+
+	    xPID->last_ref = value;
+	    return value;
+}
+
+PID_process_t* pid_init(void){
     PID_process_t *xPID;
     xPID =(PID_process_t *) malloc(sizeof(PID_process_t));
     xPID->PID=(PID_struct_t *) malloc(sizeof(PID_struct_t));
     PID_Reset(xPID);
+    return xPID;
+}
 
-    // Configure PID process
+void PID_Set_Pwm(PID_process_t *xPID, void (*set_pwm)(void *, int32_t), void *pwm_channel){
     xPID->set_pwm = set_pwm;
     xPID->pwm_channel = pwm_channel;
-    xPID->encoder_Channel = E_channel;
-    xPID->use_QEI = use_QEI;
+}
 
-    return xPID;
+void PID_Set_Encoder(PID_process_t *xPID, int32_t (*get_encoder)(void *), void *encoder_channel){
+    xPID->get_encoder = get_encoder;
+    xPID->encoder_Channel = encoder_channel;
 }
 
 void PID_Set_Cur_Position(PID_process_t *pPID, int32_t position) {

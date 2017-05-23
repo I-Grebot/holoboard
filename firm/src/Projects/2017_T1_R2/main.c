@@ -29,7 +29,7 @@ int main( void )
 {
 
   /* HoloBoard Initializations */;
-  hb_init();
+   hb_init();
 
   // Serial is started first to ensure correct print outs
   serial_init();

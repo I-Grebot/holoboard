@@ -46,8 +46,9 @@ typedef struct PID_struct_t{
 typedef struct PID_process_t{
 	void (*set_pwm)(void *, int32_t);
 	void *pwm_channel;
+	int32_t (*get_encoder)(void *);
+    void * encoder_Channel;
 //    uint8_t  DC_Motor_Channel;	// PID DC motor channel 0->3
-    uint8_t  encoder_Channel; 	// QEI channel 0->1
     uint8_t  use_QEI;         	// Use QEI peripheral? 1:Yes 0:No
     int32_t curr;
     int32_t last;
@@ -63,14 +64,17 @@ typedef struct PID_process_t{
 /*
  * PID Functions Prototypes
  */
-
 int32_t PID_Process(PID_struct_t *PID, int32_t error);
 void PID_Process_Speed(PID_process_t *sPID, uint32_t position);
 void PID_Process_Position(PID_process_t *pPID, PID_process_t *sPID, int32_t position);
+void PID_Process_holonomic(PID_process_t *pPIDx,PID_process_t *pPIDy,PID_process_t *pPIDteta);
 void PID_Set_Coefficient(PID_struct_t *PID,int8_t KP,int8_t KI,int8_t KD,uint32_t I_limit);
 void PID_Reset(PID_process_t *xPID);
+int32_t PID_Manage_limitation(PID_process_t *xPID, int32_t param);
 void PID_Set_limitation(PID_process_t *xPID,int32_t S_limit, int32_t A_limit);
-PID_process_t* pid_init(void (*set_pwm)(void *, int32_t), void *pwm_channel,uint8_t E_channel,uint8_t use_QEI);
+PID_process_t* pid_init(void);
+void PID_Set_Pwm(PID_process_t *xPID, void (*set_pwm)(void *, int32_t), void *pwm_channel);
+void PID_Set_Encoder(PID_process_t *xPID, int32_t (*get_encoder)(void *), void *encoder_channel);
 void PID_Set_Cur_Position(PID_process_t *pPID, int32_t position);
 void PID_Set_Ref_Position(PID_process_t *pPID, int32_t position);
 int32_t PID_Get_Cur_Position(PID_process_t *pPID);

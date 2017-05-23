@@ -31,6 +31,8 @@
 
 /* Local, Private functions */
 static void motion_cs_task(void *pvParameters);
+static int16_t encoder1_Old, encoder2_Old, encoder3_Old;
+static int32_t encoder1_Value=0,encoder2_Value=0,encoder3_Value=0;
 
 /* -----------------------------------------------------------------------------
  * Initializations
@@ -71,35 +73,39 @@ void motion_cs_init(void)
  * -----------------------------------------------------------------------------
  */
 
-int16_t encoder1_get_speed(void)
+int32_t encoder_get_position(uint16_t QEI)
 {
-	int16_t value;
-	value = hb_lcmxo2_get_qei(ENCODER1);
-	if(value&0x0800)
-		return value|0xF800;
-	else
-		return value;
+	int16_t encoder;
+	int16_t delta;
+
+	encoder = hb_lcmxo2_get_qei(QEI)*16;
+	switch(QEI)
+	{
+	case ENCODER1:
+	   	delta = encoder - encoder1_Old;
+	    encoder1_Old = encoder;
+	    encoder1_Value += (int32_t)delta/16;
+	    return encoder1_Value;
+	    break;
+	case ENCODER2:
+	   	delta = encoder - encoder2_Old;
+	    encoder2_Old = encoder;
+	    encoder2_Value += (int32_t)delta/16;
+	    return encoder2_Value;
+	    break;
+	case ENCODER3:
+	   	delta = encoder - encoder3_Old;
+	    encoder3_Old = encoder;
+	    encoder3_Value += (int32_t)delta/16;
+	    return encoder3_Value;
+	    break;
+	default :
+		return 0;
+	}
+	return 0;
 }
 
-int16_t encoder2_get_speed(void)
-{
-	int16_t value;
-	value = hb_lcmxo2_get_qei(ENCODER2);
-	if(value&0x0800)
-		return value|0xF800;
-	else
-		return value;
-}
 
-int16_t encoder3_get_speed(void)
-{
-	int16_t value;
-	value = hb_lcmxo2_get_qei(ENCODER3);
-	if(value&0x0800)
-		return value|0xF800;
-	else
-		return value;
-}
 
 /* -----------------------------------------------------------------------------
  * Speed setters
@@ -173,14 +179,11 @@ void motion_cs_task(void *pvParameters)
 {
   TickType_t xNextWakeTime;
   PID_process_t *pPID_1, *pPID_2, *pPID_3;
-  static int16_t dummy1=0, old_dummy1=0;
-  static int16_t dummy2=0, old_dummy2=0;
-  static int16_t dummy3=0, old_dummy3=0;
-  static int32_t position1=0, position2=0,position3=0;
-  int16_t speed_motor1;
-  int16_t speed_motor2;
-  int16_t speed_motor3;
-  int16_t speed_x=0, speed_y=0, speed_teta=100;
+  int32_t speed_motor1=0, speed_motor2=0, speed_motor3=0;
+  int32_t motor1_pos=0, motor2_pos=0, motor3_pos=0;
+  int32_t posx=0,posy=0,posteta=0;
+  int32_t speed_x=0, speed_y=0, speed_teta=0;
+  uint16_t timer=0;
   char str[60];
   /* Initialise xNextWakeTime - this only needs to be done once. */
   xNextWakeTime = xTaskGetTickCount();
@@ -191,53 +194,73 @@ void motion_cs_task(void *pvParameters)
   motor1_set_speed(0);
   motor2_set_speed(0);
   motor3_set_speed(0);
-  pPID_1 = pid_init((void*)hb_lcmxo2_set_pwm,(void*)MOTOR1,0,1);		//position PID 1
-  pPID_2 = pid_init((void*)hb_lcmxo2_set_pwm,(void*)MOTOR2,0,1);
-  pPID_3 = pid_init((void*)hb_lcmxo2_set_pwm,(void*)MOTOR3,0,1);
-  PID_Set_Coefficient(pPID_1->PID,4,0,1,0);
-  PID_Set_Coefficient(pPID_2->PID,4,0,1,0);
-  PID_Set_Coefficient(pPID_3->PID,4,0,1,0);
-  PID_Set_limitation(pPID_1,1000,0);
-  PID_Set_limitation(pPID_2,1000,0);
-  PID_Set_limitation(pPID_3,1000,0);
+  pPID_1 = pid_init();		//position PID 1
+  pPID_2 = pid_init();
+  pPID_3 = pid_init();
+  PID_Set_Pwm(pPID_1,(void*)hb_lcmxo2_set_pwm,(void*)MOTOR1);
+  PID_Set_Pwm(pPID_2,(void*)hb_lcmxo2_set_pwm,(void*)MOTOR2);
+  PID_Set_Pwm(pPID_3,(void*)hb_lcmxo2_set_pwm,(void*)MOTOR3);
+  PID_Set_Encoder(pPID_1, (void*)encoder_get_position,(void*)ENCODER1);
+  PID_Set_Encoder(pPID_2, (void*)encoder_get_position,(void*)ENCODER2);
+  PID_Set_Encoder(pPID_3, (void*)encoder_get_position,(void*)ENCODER3);
+  PID_Set_Coefficient(pPID_1->PID,1,0,0,0);
+  PID_Set_Coefficient(pPID_2->PID,1,0,0,0);
+  PID_Set_Coefficient(pPID_3->PID,1,0,0,0);
+  PID_Set_limitation(pPID_1,1000,75 );
+  PID_Set_limitation(pPID_2,1000,75);
+  PID_Set_limitation(pPID_3,500,20);
 
-  speed_motor1 = (int16_t)(speed_x*-1.366 + speed_y*-0.366 + speed_teta*20.1261);
-  speed_motor2 = (int16_t)(speed_x*1 + speed_y*-1 + speed_teta*20.1261);
-  speed_motor3 = (int16_t)(speed_x*0.366 + speed_y*1.366 + speed_teta*20.1261);
-  PID_Set_Ref_Position(pPID_1,speed_motor1);
-  PID_Set_Ref_Position(pPID_2,speed_motor2);
-  PID_Set_Ref_Position(pPID_3,speed_motor3);
+  PID_Set_Ref_Position(pPID_1,0);//7600);
+  PID_Set_Ref_Position(pPID_2,3700);
+  PID_Set_Ref_Position(pPID_3,0);//-4790);
   /* Remove compiler warning about unused parameter. */
   ( void ) pvParameters;
 
   for( ;; )
   {
-	  old_dummy1 = dummy1;
-	  dummy1=encoder1_get_speed();
-	  position1=position1+(dummy1-old_dummy1);
-	  old_dummy2 = dummy2;
-	  dummy2=encoder2_get_speed();
-	  position2=position2+(dummy2-old_dummy2);
-	  old_dummy3 = dummy3;
-	  dummy3=encoder3_get_speed();
-	  position3=position3+(dummy3-old_dummy3);
-	 // sprintf(str,"dummy1=%i \t old_dummy1=%i \t position1=%i\n\r",dummy1, old_dummy1, position1);
-	 // serial_puts(str);
-	  //old_dummy2 = dummy2;
-	  //old_dummy3 = dummy3;
-	  PID_Process_Position(pPID_1, NULL, position1);
-	  PID_Process_Position(pPID_2, NULL, position2);
-	  PID_Process_Position(pPID_3, NULL, position3);
-	  sprintf(str,"position1=%i \t position2=%i \t position3=%i\n\r",position1, position2, position3);
-	  serial_puts(str);
-	//	  motor1_set_speed(1023-dummy1);
-//	  sprintf(str,"dummy1=%u \t old_dummy1=%u \t delta1=%u\n\r",dummy1, old_dummy1, (dummy1-old_dummy1)&0x0FFF);
-//	  serial_puts(str);
-//	  dummy2 = encoder2_get_speed();
-	//  sprintf(str,"dummy2=%u \t old_dummy2=%u \t delta2=%u\n\r",dummy2, old_dummy2, (dummy2-old_dummy2)&0x0FFF);
-	//  serial_puts(str);
-	 // dummy3 = encoder3_get_speed();
-	 // sprintf(str,"dummy3=%u \t old_dummy3=%u \t delta3=%u\n\r",dummy3, old_dummy3, (dummy3-old_dummy3)&0x0FFF);
+	  PID_Process_holonomic(pPID_1,pPID_2,pPID_3);
+	  //timer++;
+	/*  if(timer==100)
+	  {
+		  speed_y=2800;
+		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
+		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
+		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
+		  PID_Set_Ref_Position(pPID_1,speed_motor1);
+		  PID_Set_Ref_Position(pPID_2,speed_motor2);
+		  PID_Set_Ref_Position(pPID_3,speed_motor3);
+	  }
+	  if(timer==200)
+	  {
+		  speed_x=0;
+		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
+		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
+		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
+		  PID_Set_Ref_Position(pPID_1,speed_motor1);
+		  PID_Set_Ref_Position(pPID_2,speed_motor2);
+		  PID_Set_Ref_Position(pPID_3,speed_motor3);
+	  }
+	  if(timer==300)
+	  {
+		  speed_y=0;
+		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
+		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
+		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
+		  PID_Set_Ref_Position(pPID_1,speed_motor1);
+		  PID_Set_Ref_Position(pPID_2,speed_motor2);
+		  PID_Set_Ref_Position(pPID_3,speed_motor3);
+	  }
+	  if(timer==400)
+	  {
+		  speed_teta=500;
+		  speed_motor1 = (int16_t)(speed_x*-0.366 + speed_y*-1.366 + speed_teta*20.1261);
+		  speed_motor2 = (int16_t)(speed_x*-1 + speed_y*1 + speed_teta*20.1261);
+		  speed_motor3 = (int16_t)(speed_x*1.366 + speed_y*0.366 + speed_teta*20.1261);
+		  PID_Set_Ref_Position(pPID_1,speed_motor1);
+		  PID_Set_Ref_Position(pPID_2,speed_motor2);
+		  PID_Set_Ref_Position(pPID_3,speed_motor3);
+	  }*/
+	  // sprintf(str,"dummy3=%u \t old_dummy3=%u \t delta3=%u\n\r",dummy3, old_dummy3, (dummy3-old_dummy3)&0x0FFF);
 	  //serial_puts(str);
 	  /* Wakes-up when required */
 	  vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS);
