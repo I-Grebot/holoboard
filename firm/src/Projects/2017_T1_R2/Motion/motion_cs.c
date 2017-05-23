@@ -29,10 +29,22 @@
 #define TICK_PER_REV 1400
 #define WHEEL_PERIMETER 188.5
 
+#define CALIB_DISTANCE_X_IN_MM		500
+#define CALIB_DISTANCE_X_IN_TICKS	3900
+#define CALIB_DISTANCE_Y_IN_MM		500
+#define CALIB_DISTANCE_Y_IN_TICKS	3700
+#define CALIB_DISTANCE_TETA_IN_DEGREE	360
+#define CALIB_DISTANCE_TETA_IN_TICKS	479
+
 /* Local, Private functions */
 static void motion_cs_task(void *pvParameters);
 static int16_t encoder1_Old, encoder2_Old, encoder3_Old;
 static int32_t encoder1_Value=0,encoder2_Value=0,encoder3_Value=0;
+
+static int32_t ratio_x_mm_per_ticks, ratio_y_mm_per_ticks, ratio_teta_degree_per_ticks;
+
+
+PID_process_t *pPID_1, *pPID_2, *pPID_3;
 
 /* -----------------------------------------------------------------------------
  * Initializations
@@ -193,6 +205,48 @@ void robot_set_speed(int speed_x, int speed_y, int speed_teta)
  */
 
 /* -----------------------------------------------------------------------------
+ * Helpers GoTo Position
+ * -----------------------------------------------------------------------------
+ */
+
+
+
+void set_ratio_x_mm_per_ticks(int32_t ticks_for_distance, int32_t distance_mm) {
+	ratio_x_mm_per_ticks = 1000000 * distance_mm / ticks_for_distance;
+}
+
+void set_ratio_y_mm_per_ticks(int32_t ticks_for_distance, int32_t distance_mm) {
+	ratio_y_mm_per_ticks = 1000000 * distance_mm / ticks_for_distance;
+}
+
+void set_ratio_teta_degree_per_ticks(int32_t ticks_for_rotation, int32_t rotation_deg)
+{
+	ratio_teta_degree_per_ticks = 1000000 * rotation_deg / ticks_for_rotation;
+}
+
+void go_to_position_relative(int32_t x, int32_t y, int32_t teta)
+{
+
+}
+
+
+void go_to_position_absolute_ticks(int32_t x, int32_t y, int32_t teta)
+{
+	PID_Set_Ref_Position(pPID_1, x);
+	PID_Set_Ref_Position(pPID_2, y);
+	PID_Set_Ref_Position(pPID_3, teta);
+}
+
+void go_to_position_absolute_metric(int32_t x, int32_t y, int32_t teta)
+{
+	int32_t x_in_ticks = x * 1000000 / ratio_x_mm_per_ticks;
+	int32_t y_in_ticks = y * 1000000 / ratio_y_mm_per_ticks;
+	int32_t teta_in_ticks = teta * 1000000 / ratio_teta_degree_per_ticks;
+
+	go_to_position_absolute_ticks(x_in_ticks, y_in_ticks, teta_in_ticks);
+}
+
+/* -----------------------------------------------------------------------------
  * Main Motion Control System Managment Task
  * TODO: handle re-init of the task
  * -----------------------------------------------------------------------------
@@ -201,7 +255,6 @@ void robot_set_speed(int speed_x, int speed_y, int speed_teta)
 void motion_cs_task(void *pvParameters)
 {
   TickType_t xNextWakeTime;
-  PID_process_t *pPID_1, *pPID_2, *pPID_3;
 
   uint16_t timer=0;
 
@@ -235,9 +288,11 @@ void motion_cs_task(void *pvParameters)
   PID_Set_limitation(pPID_2,500,75);
   PID_Set_limitation(pPID_3,500,20);
 
-  PID_Set_Ref_Position(pPID_1,0);//7600);
-  PID_Set_Ref_Position(pPID_2,3700);
-  PID_Set_Ref_Position(pPID_3,0);//-4790);
+  set_ratio_x_mm_per_ticks(CALIB_DISTANCE_X_IN_TICKS, CALIB_DISTANCE_X_IN_MM);
+  set_ratio_y_mm_per_ticks(CALIB_DISTANCE_Y_IN_TICKS, CALIB_DISTANCE_Y_IN_MM);
+  set_ratio_teta_degree_per_ticks(CALIB_DISTANCE_TETA_IN_TICKS, CALIB_DISTANCE_TETA_IN_DEGREE);
+
+  go_to_position_absolute_metric(0, 500, 0);
 
   /* Remove compiler warning about unused parameter. */
   ( void ) pvParameters;
@@ -249,17 +304,22 @@ void motion_cs_task(void *pvParameters)
 
 	  if(timer==100)
 	  {
-		  PID_Set_Ref_Position(pPID_1,3900);
+		  go_to_position_absolute_metric(500, 500, 0);
 	  }
 
 	  if(timer==200)
 	  {
-		  PID_Set_Ref_Position(pPID_2,0);
+		  go_to_position_absolute_metric(500, 0, 0);
 	  }
 
 	  if(timer==300)
 	  {
-		  PID_Set_Ref_Position(pPID_1,0);
+		  go_to_position_absolute_metric(0, 0, 0);
+	  }
+
+	  if(timer == 400)
+	  {
+		  go_to_position_absolute_metric(0, 0, 360);
 	  }
 
 	  // sprintf(str,"dummy3=%u \t old_dummy3=%u \t delta3=%u\n\r",dummy3, old_dummy3, (dummy3-old_dummy3)&0x0FFF);
