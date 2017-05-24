@@ -117,6 +117,9 @@ void hb_dbg_init(USART_InitTypeDef * USART_InitStruct);
 void hb_dbg_enable(uint32_t nvic_priority);
 void hb_dbg_disable(void);
 
+/* IR Sensors */
+void hb_irsensor_init(void);
+
 #ifdef __cplusplus
 }
 #endif

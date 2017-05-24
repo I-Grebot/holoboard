@@ -203,6 +203,80 @@
 #define DBG_TX_AF                       GPIO_AF7_USART1
 #define DBG_TX_PIN_SOURCE               GPIO_PinSource9
 
+/* IR Sensors Mapped*/
+
+/* IR Sensor 0 */
+#define IRSENSOR0_GPIO_PORT             GPIOB
+#define IRSENSOR0_PIN                   GPIO_Pin_13
+#define IRSENSOR0_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
+#define IRSENSOR0_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
+#define IRSENSOR0_VALUE                 GPIO_ReadInputDataBit(IRSENSOR0_GPIO_PORT, IRSENSOR0_PIN)
+
+/* IR Sensor 1 */
+#define IRSENSOR1_GPIO_PORT             GPIOB
+#define IRSENSOR1_PIN                   GPIO_Pin_15
+#define IRSENSOR1_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
+#define IRSENSOR1_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
+#define IRSENSOR1_VALUE                 GPIO_ReadInputDataBit(IRSENSOR1_GPIO_PORT, IRSENSOR1_PIN)
+
+/* IR Sensor 2 */
+#define IRSENSOR2_GPIO_PORT             GPIOD
+#define IRSENSOR2_PIN                   GPIO_Pin_9
+#define IRSENSOR2_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define IRSENSOR2_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define IRSENSOR2_VALUE                 GPIO_ReadInputDataBit(IRSENSOR2_GPIO_PORT, IRSENSOR2_PIN)
+
+/* IR Sensor 3 */
+#define IRSENSOR3_GPIO_PORT             GPIOD
+#define IRSENSOR3_PIN                   GPIO_Pin_11
+#define IRSENSOR3_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define IRSENSOR3_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define IRSENSOR3_VALUE                 GPIO_ReadInputDataBit(IRSENSOR3_GPIO_PORT, IRSENSOR3_PIN)
+
+/* IR Sensor 4 */
+#define IRSENSOR4_GPIO_PORT             GPIOA
+#define IRSENSOR4_PIN                   GPIO_Pin_11
+#define IRSENSOR4_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE)
+#define IRSENSOR4_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, DISABLE)
+#define IRSENSOR4_VALUE                 GPIO_ReadInputDataBit(IRSENSOR4_GPIO_PORT, IRSENSOR4_PIN)
+
+/* IR Sensor 5 */
+#define IRSENSOR5_GPIO_PORT             GPIOB
+#define IRSENSOR5_PIN                   GPIO_Pin_12
+#define IRSENSOR5_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
+#define IRSENSOR5_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
+#define IRSENSOR5_VALUE                 GPIO_ReadInputDataBit(IRSENSOR5_GPIO_PORT, IRSENSOR5_PIN)
+
+/* IR Sensor 6 */
+#define IRSENSOR6_GPIO_PORT             GPIOB
+#define IRSENSOR6_PIN                   GPIO_Pin_14
+#define IRSENSOR6_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE)
+#define IRSENSOR6_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, DISABLE)
+#define IRSENSOR6_VALUE                 GPIO_ReadInputDataBit(IRSENSOR6_GPIO_PORT, IRSENSOR6_PIN)
+
+/* IR Sensor 7 */
+#define IRSENSOR7_GPIO_PORT             GPIOD
+#define IRSENSOR7_PIN                   GPIO_Pin_8
+#define IRSENSOR7_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define IRSENSOR7_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define IRSENSOR7_VALUE                 GPIO_ReadInputDataBit(IRSENSOR7_GPIO_PORT, IRSENSOR7_PIN)
+
+/* IR Sensor 8 */
+#define IRSENSOR8_GPIO_PORT             GPIOD
+#define IRSENSOR8_PIN                   GPIO_Pin_10
+#define IRSENSOR8_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define IRSENSOR8_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define IRSENSOR8_VALUE                 GPIO_ReadInputDataBit(IRSENSOR8_GPIO_PORT, IRSENSOR8_PIN)
+
+/* IR Sensor 9 */
+#define IRSENSOR9_GPIO_PORT             GPIOA
+#define IRSENSOR9_PIN                   GPIO_Pin_12
+#define IRSENSOR9_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE)
+#define IRSENSOR9_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, DISABLE)
+#define IRSENSOR9_VALUE                 GPIO_ReadInputDataBit(IRSENSOR9_GPIO_PORT, IRSENSOR9_PIN)
+
+
+
 /**
  * @}
  */
