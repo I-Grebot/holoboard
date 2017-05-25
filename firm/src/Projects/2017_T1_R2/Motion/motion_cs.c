@@ -265,6 +265,10 @@ void motion_cs_task(void *pvParameters)
   uint8_t should_use_irsensor_1 = 0;
   uint8_t should_use_irsensor_2 = 0;
 
+  uint8_t should_use_irsensor_3 = 0;
+  uint8_t should_use_irsensor_4 = 0;
+  uint8_t should_use_irsensor_5 = 0;
+
   is_started = 0;
   is_init = 0;
 
@@ -339,28 +343,42 @@ void motion_cs_task(void *pvParameters)
 	//  led_set_mode(HB_LED_BLINK_SLOW);
 
 	  //sensors position
+	  //	  4
 	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
-	  //      1
+	  //    3 1 5
 
-	  if(timer == 0)
+	  if(timer == (5000/MOTION_CONTROL_PERIOD_TICKS))
 	  {
 		  should_use_irsensor_0 = 0;
 		  should_use_irsensor_1 = 0;
 		  should_use_irsensor_2 = 1;
+
+		  should_use_irsensor_3 = 1;
+		  should_use_irsensor_4 = 1;
+		  should_use_irsensor_5 = 0;
 		  go_to_position_relative_metric(0, -1000, 0);
 	  }
-	  if(timer == (4000/MOTION_CONTROL_PERIOD_TICKS))
+	  if(timer == (9000/MOTION_CONTROL_PERIOD_TICKS))
 	  {
 		  should_use_irsensor_0 = 0;
 		  should_use_irsensor_1 = 0;
 		  should_use_irsensor_2 = 0;
+
+		  should_use_irsensor_3 = 0;
+		  should_use_irsensor_4 = 0;
+		  should_use_irsensor_5 = 0;
+
 		  go_to_position_relative_metric(0, -1000, 45);
 	  }
-	  if(timer == (6000/MOTION_CONTROL_PERIOD_TICKS))
+	  if(timer == (11000/MOTION_CONTROL_PERIOD_TICKS))
 	  {
 		  should_use_irsensor_0 = 0;
 		  should_use_irsensor_1 = 0;
 		  should_use_irsensor_2 = 1;
+
+		  should_use_irsensor_3 = 1;
+		  should_use_irsensor_4 = 1;
+		  should_use_irsensor_5 = 0;
 		  go_to_position_relative_metric(0, -1000-1500, 0);
 	  }
 
@@ -397,7 +415,8 @@ void motion_cs_task(void *pvParameters)
 
 
 	  //pause the robot when a valid obstacle is detected
-	  if((should_use_irsensor_0 && sensor0detect) || (should_use_irsensor_1 && sensor1detect) || (should_use_irsensor_2 && sensor2detect))
+	  if((should_use_irsensor_0 && sensor0detect) || (should_use_irsensor_1 && sensor1detect) || (should_use_irsensor_2 && sensor2detect)
+			  || (should_use_irsensor_3 && sensor3detect) || (should_use_irsensor_4 && sensor4detect) || (should_use_irsensor_5 && sensor5detect))
 	  {
 		  PID_Pause_holonomic(pPID_1, pPID_2, pPID_3);
 	  }
