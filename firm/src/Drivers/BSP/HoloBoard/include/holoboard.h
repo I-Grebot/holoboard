@@ -91,6 +91,14 @@ typedef enum {
     HB_PWR_VP3 = 2
 } HB_PWR_TypeDef;
 
+
+/* List of TURRET frame states */
+/* SPI CSn is Active Low when actively transmitting a frame */
+typedef enum {
+    HB_TURRET_FRAME_IDLE   = (Bit_SET),
+    HB_TURRET_FRAME_ACTIVE = (Bit_RESET)
+} HB_HMI_FrameTypeDef;
+
 /**
 ********************************************************************************
 **
@@ -124,6 +132,9 @@ void hb_lcmxo2_init(void);
 uint16_t hb_lcmxo2_tx_rx(uint16_t value);
 void hb_lcmxo2_set_pwm(uint16_t motor, int16_t value);
 int16_t hb_lcmxo2_get_qei(uint16_t encoder);
+
+/* Turret */
+void hc_turret_init(void);
 
 /* Debug Interface */
 void hb_dbg_init(USART_InitTypeDef * USART_InitStruct);

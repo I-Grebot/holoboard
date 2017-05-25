@@ -318,6 +318,48 @@
 #define VP3_EN_GPIO_CLK_DISABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
 #define VP3_EN_PIN                         GPIO_Pin_1
 
+/* Turret */
+
+/* Definitions for TURRET SPI connected on SPI3 */
+#define TURRET_COM                             SPI3
+#define TURRET_CLK_ENABLE()                    RCC_APB2PeriphClockCmd(RCC_APB1Periph_SPI3, ENABLE)
+#define TURRET_CLK_DISABLE()                   RCC_APB2PeriphClockCmd(RCC_APB1Periph_SPI3, DISABLE)
+#define TURRET_IRQn                            SPI3_IRQn
+
+/* TURRET_SCK Mapped on PC10 */
+#define TURRET_SCK_GPIO_PORT                   GPIOC
+#define TURRET_SCK_GPIO_CLK_ENABLE()           RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define TURRET_SCK_GPIO_CLK_DISABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define TURRET_SCK_PIN                         GPIO_Pin_10
+#define TURRET_SCK_AF                          GPIO_AF5_SPI3
+#define TURRET_SCK_PIN_SOURCE                  GPIO_PinSource10
+
+/* TURRET_CSN Mapped on PD0 */
+#define TURRET_CSN_GPIO_PORT                   GPIOD
+#define TURRET_CSN_GPIO_CLK_ENABLE()           RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define TURRET_CSN_GPIO_CLK_DISABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define TURRET_CSN_PIN                         GPIO_Pin_0
+#define TURRET_CSN_AF                          GPIO_AF5_SPI3
+#define TURRET_CSN_PIN_SOURCE                  GPIO_PinSource0
+#define TURRET_CSN_WRITE(v)                    GPIO_WriteBit(TURRET_CSN_GPIO_PORT, TURRET_CSN_PIN, (v))
+
+/* TURRET_MISO Mapped on PC11 */
+#define TURRET_MISO_GPIO_PORT                  GPIOC
+#define TURRET_MISO_GPIO_CLK_ENABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define TURRET_MISO_GPIO_CLK_DISABLE()         RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define TURRET_MISO_PIN                        GPIO_Pin_11
+#define TURRET_MISO_AF                         GPIO_AF5_SPI3
+#define TURRET_MISO_PIN_SOURCE                 GPIO_PinSource11
+
+/* TURRET_MOSI Mapped on PC12 */
+#define TURRET_MOSI_GPIO_PORT                  GPIOC
+#define TURRET_MOSI_GPIO_CLK_ENABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define TURRET_MOSI_GPIO_CLK_DISABLE()         RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define TURRET_MOSI_PIN                        GPIO_Pin_12
+#define TURRET_MOSI_AF                         GPIO_AF5_SPI3
+#define TURRET_MOSI_PIN_SOURCE                 GPIO_PinSource12
+
+
 /**
  * @}
  */
