@@ -292,6 +292,32 @@
 #define ENDSTOP1_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
 #define ENDSTOP1_VALUE                 GPIO_ReadInputDataBit(ENDSTOP1_GPIO_PORT, ENDSTOP1_PIN)
 
+
+/* Number of instances */
+#define PWRn                               ((uint8_t) 3)
+
+/* MCU I/O must be tight to VDD to switch the module OFF */
+#define PWRx_ON                            (Bit_RESET)
+#define PWRx_OFF                           (Bit_SET)
+
+/* VP1_EN Mapped on PC1 */
+#define VP1_EN_GPIO_PORT                   GPIOC
+#define VP1_EN_GPIO_CLK_ENABLE()           RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
+#define VP1_EN_GPIO_CLK_DISABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
+#define VP1_EN_PIN                         GPIO_Pin_2
+
+/* VP2_EN Mapped on PC1 */
+#define VP2_EN_GPIO_PORT                   GPIOC
+#define VP2_EN_GPIO_CLK_ENABLE()           RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
+#define VP2_EN_GPIO_CLK_DISABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
+#define VP2_EN_PIN                         GPIO_Pin_3
+
+/* VP3_EN Mapped on PC1 */
+#define VP3_EN_GPIO_PORT                   GPIOC
+#define VP3_EN_GPIO_CLK_ENABLE()           RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE)
+#define VP3_EN_GPIO_CLK_DISABLE()          RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, DISABLE)
+#define VP3_EN_PIN                         GPIO_Pin_1
+
 /**
  * @}
  */

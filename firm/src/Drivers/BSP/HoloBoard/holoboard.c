@@ -47,6 +47,7 @@ void hb_init(void)
     hb_system_clock_config();
 
     /* Modules without custom-configuration */
+    hb_pwr_init();
     hb_led_init();
     hb_lcmxo2_init();
     hb_irsensor_init();
@@ -54,4 +55,30 @@ void hb_init(void)
 
     /* Set Interrupt group priority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+}
+
+/**
+  * @brief  Apply the power-up sequence
+  * @param  None
+  * @retval None
+  */
+void hb_power_up(void)
+{
+    /* Enable powers */
+    hb_pwr_enable(HB_PWR_VP1);
+    hb_pwr_enable(HB_PWR_VP2);
+    hb_pwr_enable(HB_PWR_VP3);
+}
+
+/**
+  * @brief  Apply the power-down sequence
+  * @param  None
+  * @retval None
+  */
+void hb_power_down(void)
+{
+    /* Disable Power */
+    hb_pwr_disable(HB_PWR_VP1);
+    hb_pwr_disable(HB_PWR_VP2);
+    hb_pwr_disable(HB_PWR_VP3);
 }

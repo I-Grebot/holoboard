@@ -84,6 +84,12 @@ typedef enum {
     HB_LED_BLINK_FAST   = 2
 } HB_LED_ModeTypeDef;
 
+/* List of available power enables */
+typedef enum {
+    HB_PWR_VP1 = 0,
+    HB_PWR_VP2 = 1,
+    HB_PWR_VP3 = 2
+} HB_PWR_TypeDef;
 
 /**
 ********************************************************************************
@@ -95,12 +101,19 @@ typedef enum {
 
 /* Hardware Top */
 void hb_init(void);
+void hb_power_up(void);
+void hb_power_down(void);
 
 /* System */
 void hb_system_clock_config(void);
 void hb_sys_cpu_cache_enable(void);
 void hb_sys_timer_run_time_config();
 uint32_t hb_sys_timer_get_run_time_ticks(void);
+
+/* Power modules */
+void hb_pwr_init(void);
+void hb_pwr_enable(HB_PWR_TypeDef power);
+void hb_pwr_disable(HB_PWR_TypeDef power);
 
 /* RGB LED */
 void hb_led_init(void);
