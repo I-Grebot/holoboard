@@ -260,6 +260,9 @@ void motion_cs_task(void *pvParameters)
   TickType_t xNextWakeTime;
 
   uint16_t timer=0;
+  uint16_t timer_delay = 0;
+
+  uint8_t is_yellow = 0;
 
   uint8_t should_use_irsensor_0 = 0;
   uint8_t should_use_irsensor_1 = 0;
@@ -343,25 +346,25 @@ void motion_cs_task(void *pvParameters)
 	//  led_set_mode(HB_LED_BLINK_SLOW);
 
 	  //sensors position
-	  //	  4
+	  //	  5
 	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
-	  //    3 1 5
+	  //      1 4
 
 	  if(timer == 0) {
 		  go_to_position_relative_metric(0, 0, 0);
 	  }
-	  if(timer == (5000/MOTION_CONTROL_PERIOD_TICKS))
+	  if(timer == (5000/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  should_use_irsensor_0 = 1;
-		  should_use_irsensor_1 = 1;
+		  should_use_irsensor_0 = is_yellow ? 1 : 0; //sould not detect wall
+		  should_use_irsensor_1 = is_yellow ? 0 : 1;
 		  should_use_irsensor_2 = 0;
 
 		  should_use_irsensor_3 = 0;
-		  should_use_irsensor_4 = 0;
-		  should_use_irsensor_5 = 1;
-		  go_to_position_relative_metric(0, -1000, 0);
+		  should_use_irsensor_4 = 1;
+		  should_use_irsensor_5 = 0;
+		  go_to_position_relative_metric(0, 900, 0);
 	  }
-	  if(timer == (9000/MOTION_CONTROL_PERIOD_TICKS))
+	  if(timer == (9000/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
 		  should_use_irsensor_0 = 0;
 		  should_use_irsensor_1 = 0;
@@ -371,18 +374,18 @@ void motion_cs_task(void *pvParameters)
 		  should_use_irsensor_4 = 0;
 		  should_use_irsensor_5 = 0;
 
-		  go_to_position_relative_metric(0, -1000, 45);
+		  go_to_position_relative_metric(0, 900, is_yellow ? -45 : 45);
 	  }
-	  if(timer == (11000/MOTION_CONTROL_PERIOD_TICKS))
+	  if(timer == (11000/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
 		  should_use_irsensor_0 = 1;
 		  should_use_irsensor_1 = 1;
 		  should_use_irsensor_2 = 0;
 
 		  should_use_irsensor_3 = 0;
-		  should_use_irsensor_4 = 0;
-		  should_use_irsensor_5 = 1;
-		  go_to_position_relative_metric(0, -1000-1500, 0);
+		  should_use_irsensor_4 = 1;
+		  should_use_irsensor_5 = 0;
+		  go_to_position_relative_metric(0, 900+1500, is_yellow ? -45 : 45);
 	  }
 
 	  /*if(timer == 0)
@@ -422,6 +425,7 @@ void motion_cs_task(void *pvParameters)
 			  || (should_use_irsensor_3 && sensor3detect) || (should_use_irsensor_4 && sensor4detect) || (should_use_irsensor_5 && sensor5detect))
 	  {
 		  PID_Pause_holonomic(pPID_1, pPID_2, pPID_3);
+		  timer_delay++;
 	  }
 	  else // run when no valid obstacle
 	  {
