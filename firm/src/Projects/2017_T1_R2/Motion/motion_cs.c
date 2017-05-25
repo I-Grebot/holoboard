@@ -293,8 +293,8 @@ void motion_cs_task(void *pvParameters)
   PID_Set_Coefficient(pPID_3->PID,1,0,0,0);
 
   /* Init PID limitation */
-  PID_Set_limitation(pPID_1,500,75);
-  PID_Set_limitation(pPID_2,500,75);
+  PID_Set_limitation(pPID_1,700,75);
+  PID_Set_limitation(pPID_2,700,75);
   PID_Set_limitation(pPID_3,500,20);
 
   set_ratio_x_mm_per_ticks(CALIB_DISTANCE_X_IN_TICKS, CALIB_DISTANCE_X_IN_MM);
@@ -341,7 +341,30 @@ void motion_cs_task(void *pvParameters)
 	  //sensors position
 	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
 	  //      1
+
 	  if(timer == 0)
+	  {
+		  should_use_irsensor_0 = 0;
+		  should_use_irsensor_1 = 0;
+		  should_use_irsensor_2 = 1;
+		  go_to_position_relative_metric(0, -1000, 0);
+	  }
+	  if(timer == (4000/MOTION_CONTROL_PERIOD_TICKS))
+	  {
+		  should_use_irsensor_0 = 0;
+		  should_use_irsensor_1 = 0;
+		  should_use_irsensor_2 = 0;
+		  go_to_position_relative_metric(0, -1000, 45);
+	  }
+	  if(timer == (6000/MOTION_CONTROL_PERIOD_TICKS))
+	  {
+		  should_use_irsensor_0 = 0;
+		  should_use_irsensor_1 = 0;
+		  should_use_irsensor_2 = 1;
+		  go_to_position_relative_metric(0, -1000-1500, 0);
+	  }
+
+	  /*if(timer == 0)
 	  {
 		  should_use_irsensor_0 = 0;
 		  should_use_irsensor_1 = 1;
@@ -370,7 +393,7 @@ void motion_cs_task(void *pvParameters)
 		  should_use_irsensor_1 = 0;
 		  should_use_irsensor_2 = 0;
 		  go_to_position_relative_metric(-200, -500, 180);
-	  }
+	  }*/
 
 
 	  //pause the robot when a valid obstacle is detected
