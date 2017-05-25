@@ -50,6 +50,7 @@ void hb_init(void)
     hb_led_init();
     hb_lcmxo2_init();
     hb_irsensor_init();
+    hb_endstop_init();
 
     /* Set Interrupt group priority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);

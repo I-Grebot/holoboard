@@ -276,6 +276,21 @@
 #define IRSENSOR9_VALUE                 GPIO_ReadInputDataBit(IRSENSOR9_GPIO_PORT, IRSENSOR9_PIN)
 
 
+/* END Stop mapped*/
+
+/* END Stop 0 */
+#define ENDSTOP0_GPIO_PORT             GPIOE
+#define ENDSTOP0_PIN                   GPIO_Pin_10
+#define ENDSTOP0_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define ENDSTOP0_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define ENDSTOP0_VALUE                 GPIO_ReadInputDataBit(ENDSTOP0_GPIO_PORT, ENDSTOP0_PIN)
+
+/* END Stop 1 */
+#define ENDSTOP1_GPIO_PORT             GPIOE
+#define ENDSTOP1_PIN                   GPIO_Pin_11
+#define ENDSTOP1_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define ENDSTOP1_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define ENDSTOP1_VALUE                 GPIO_ReadInputDataBit(ENDSTOP1_GPIO_PORT, ENDSTOP1_PIN)
 
 /**
  * @}
