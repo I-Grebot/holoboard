@@ -348,7 +348,7 @@ void motion_cs_task(void *pvParameters)
 		  should_use_irsensor_2 = 0;
 		  go_to_position_relative_metric(500, 200, 0);
 	  }
-	  if(timer == 500)
+	  if(timer == (10000/MOTION_CONTROL_PERIOD_TICKS)) // 10s
 	  {
 		  should_use_irsensor_0 = 1;
 		  should_use_irsensor_1 = 0;
@@ -356,7 +356,7 @@ void motion_cs_task(void *pvParameters)
 		  go_to_position_relative_metric(-200, 500, 0);
 	  }
 
-	  if(timer == 1000)
+	  if(timer == (20000/MOTION_CONTROL_PERIOD_TICKS)) // 20s
 	  {
 		  should_use_irsensor_0 = 0;
 		  should_use_irsensor_1 = 0;
@@ -364,7 +364,7 @@ void motion_cs_task(void *pvParameters)
 		  go_to_position_relative_metric(-200, -500, 0);
 	  }
 
-	  if(timer == 1000)
+	  if(timer == (30000/MOTION_CONTROL_PERIOD_TICKS)) // 30s
 	  {
 		  should_use_irsensor_0 = 0;
 		  should_use_irsensor_1 = 0;
@@ -383,16 +383,16 @@ void motion_cs_task(void *pvParameters)
 		  PID_Process_holonomic(pPID_1, pPID_2, pPID_3);
 	  }
 
-	  /*if(should_use_irsensor_0 == 0 || (should_use_irsensor_0 == 1 && sensor0detect == 0))
-	  {
-		  PID_Process_holonomic(pPID_1, pPID_2, pPID_3);
-	  }
-	  else
-	  {
-		  PID_Pause_holonomic(pPID_1, pPID_2, pPID_3);
-	  }*/
 
 	  timer++;
+
+	  // end of game
+	  if(timer> (90000/MOTION_CONTROL_PERIOD_TICKS))
+	  {
+		  PID_Pause_holonomic(pPID_1, pPID_2, pPID_3);
+		  led_set_color(HB_LED_RED);
+		  while(1);
+	  }
 
 	  // sprintf(str,"dummy3=%u \t old_dummy3=%u \t delta3=%u\n\r",dummy3, old_dummy3, (dummy3-old_dummy3)&0x0FFF);
 	  //serial_puts(str);
