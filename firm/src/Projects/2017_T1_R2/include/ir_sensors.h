@@ -8,6 +8,6 @@
 #ifndef PROJECTS_2017_T1_R2_INCLUDE_IR_SENSORS_H_
 #define PROJECTS_2017_T1_R2_INCLUDE_IR_SENSORS_H_
 
-extern uint8_t sensor0, sensor1, sensor2;
+extern uint8_t sensor0detect, sensor1detect, sensor2detect;
 
 #endif /* PROJECTS_2017_T1_R2_INCLUDE_IR_SENSORS_H_ */

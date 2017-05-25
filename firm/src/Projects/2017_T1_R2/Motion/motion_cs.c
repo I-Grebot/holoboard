@@ -36,6 +36,7 @@
 #define CALIB_DISTANCE_Y_IN_TICKS	3700
 #define CALIB_DISTANCE_TETA_IN_DEGREE	360
 #define CALIB_DISTANCE_TETA_IN_TICKS	479
+#define CALIB_SCALER 100000
 
 #define HAS_TIRETTE	1
 
@@ -216,16 +217,16 @@ void robot_set_speed(int speed_x, int speed_y, int speed_teta)
 
 
 void set_ratio_x_mm_per_ticks(int32_t ticks_for_distance, int32_t distance_mm) {
-	ratio_x_mm_per_ticks = 1000000 * distance_mm / ticks_for_distance;
+	ratio_x_mm_per_ticks = (CALIB_SCALER * distance_mm) / ticks_for_distance;
 }
 
 void set_ratio_y_mm_per_ticks(int32_t ticks_for_distance, int32_t distance_mm) {
-	ratio_y_mm_per_ticks = 1000000 * distance_mm / ticks_for_distance;
+	ratio_y_mm_per_ticks = (CALIB_SCALER * distance_mm) / ticks_for_distance;
 }
 
 void set_ratio_teta_degree_per_ticks(int32_t ticks_for_rotation, int32_t rotation_deg)
 {
-	ratio_teta_degree_per_ticks = 1000000 * rotation_deg / ticks_for_rotation;
+	ratio_teta_degree_per_ticks = (CALIB_SCALER * rotation_deg) / ticks_for_rotation;
 }
 
 void go_to_position_ticks(int32_t x, int32_t y, int32_t teta)
@@ -237,9 +238,9 @@ void go_to_position_ticks(int32_t x, int32_t y, int32_t teta)
 
 void go_to_position_relative_metric(int32_t x, int32_t y, int32_t teta)
 {
-	int32_t x_in_ticks = x * 1000000 / ratio_x_mm_per_ticks;
-	int32_t y_in_ticks = y * 1000000 / ratio_y_mm_per_ticks;
-	int32_t teta_in_ticks = teta * 1000000 / ratio_teta_degree_per_ticks;
+	int32_t x_in_ticks = (x * CALIB_SCALER) / ratio_x_mm_per_ticks;
+	int32_t y_in_ticks = (y * CALIB_SCALER) / ratio_y_mm_per_ticks;
+	int32_t teta_in_ticks = (teta * CALIB_SCALER) / ratio_teta_degree_per_ticks;
 
 	go_to_position_ticks(x_in_ticks, y_in_ticks, teta_in_ticks);
 }
@@ -261,6 +262,8 @@ void motion_cs_task(void *pvParameters)
   uint16_t timer=0;
 
   uint8_t should_use_irsensor_0 = 0;
+  uint8_t should_use_irsensor_1 = 0;
+  uint8_t should_use_irsensor_2 = 0;
 
   is_started = 0;
   is_init = 0;
@@ -269,8 +272,7 @@ void motion_cs_task(void *pvParameters)
   xNextWakeTime = xTaskGetTickCount();
 
   /* Wait for 1s to let lcmxo2 startup */
-  vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS*10);
-  LCMXO2_RESET_WRITE(LCMXO2_RESET_OFF);
+  LCMXO2_RESET_WRITE(LCMXO2_RESET_ON);
   vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS*10);
 
   /* Init motors and PID */
@@ -303,7 +305,7 @@ void motion_cs_task(void *pvParameters)
   /* Remove compiler warning about unused parameter. */
   ( void ) pvParameters;
   led_set_mode(HB_LED_BLINK_FAST);
-  led_set_mode(HB_LED_RED);
+  led_set_color(HB_LED_RED);
   while(is_init == 0)
   {
 	  if(ENDSTOP0_VALUE == HAS_TIRETTE)
@@ -312,7 +314,7 @@ void motion_cs_task(void *pvParameters)
 		  vTaskDelayUntil( &xNextWakeTime, 100);
 		  if(ENDSTOP0_VALUE == HAS_TIRETTE)
 		  {
-			  led_set_mode(HB_LED_BLUE);
+			  led_set_color(HB_LED_BLUE);
 			  is_init = 1;
 		  }
 	  }
@@ -325,6 +327,8 @@ void motion_cs_task(void *pvParameters)
 	  if(ENDSTOP0_VALUE != HAS_TIRETTE)
 	  {
 		  is_started = 1;
+		  LCMXO2_RESET_WRITE(LCMXO2_RESET_OFF);
+		  vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS*50);
 	  }
 
 	  vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS);
@@ -332,51 +336,63 @@ void motion_cs_task(void *pvParameters)
 
   for( ;; )
   {
-	  led_set_mode(HB_LED_GREEN);
+	//  led_set_mode(HB_LED_BLINK_SLOW);
 
-	  if(should_use_irsensor_0 == 0 || (should_use_irsensor_0 == 1 && sensor0 == 0))
+	  //sensors position
+	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
+	  //      1
+	  if(timer == 0)
+	  {
+		  should_use_irsensor_0 = 0;
+		  should_use_irsensor_1 = 1;
+		  should_use_irsensor_2 = 0;
+		  go_to_position_relative_metric(500, 200, 0);
+	  }
+	  if(timer == 500)
+	  {
+		  should_use_irsensor_0 = 1;
+		  should_use_irsensor_1 = 0;
+		  should_use_irsensor_2 = 0;
+		  go_to_position_relative_metric(-200, 500, 0);
+	  }
+
+	  if(timer == 1000)
+	  {
+		  should_use_irsensor_0 = 0;
+		  should_use_irsensor_1 = 0;
+		  should_use_irsensor_2 = 1;
+		  go_to_position_relative_metric(-200, -500, 0);
+	  }
+
+	  if(timer == 1000)
+	  {
+		  should_use_irsensor_0 = 0;
+		  should_use_irsensor_1 = 0;
+		  should_use_irsensor_2 = 0;
+		  go_to_position_relative_metric(-200, -500, 180);
+	  }
+
+
+	  //pause the robot when a valid obstacle is detected
+	  if((should_use_irsensor_0 && sensor0detect) || (should_use_irsensor_1 && sensor1detect) || (should_use_irsensor_2 && sensor2detect))
+	  {
+		  PID_Pause_holonomic(pPID_1, pPID_2, pPID_3);
+	  }
+	  else // run when no valid obstacle
+	  {
+		  PID_Process_holonomic(pPID_1, pPID_2, pPID_3);
+	  }
+
+	  /*if(should_use_irsensor_0 == 0 || (should_use_irsensor_0 == 1 && sensor0detect == 0))
 	  {
 		  PID_Process_holonomic(pPID_1, pPID_2, pPID_3);
 	  }
 	  else
 	  {
 		  PID_Pause_holonomic(pPID_1, pPID_2, pPID_3);
-	  }
+	  }*/
 
 	  timer++;
-
-	  if(timer == 0)
-	  {
-		  go_to_position_relative_metric(0, 1000, 0);
-	  }
-
-//	  if(timer == 200) {
-//		  go_to_position_relative_metric(0, 1000, 90);
-//	  }
-	  if(timer == 300) {
-		  //should_use_irsensor_0 = 1;
-		  go_to_position_relative_metric(0, 3000, 0);
-	  }
-
-//	  if(timer==100)
-//	  {
-//		  go_to_position_relative_metric(500, 500, 0);
-//	  }
-//
-//	  if(timer==200)
-//	  {
-//		  go_to_position_relative_metric(500, 0, 0);
-//	  }
-//
-//	  if(timer==300)
-//	  {
-//		  go_to_position_relative_metric(0, 0, 0);
-//	  }
-//
-//	  if(timer == 400)
-//	  {
-//		  go_to_position_relative_metric(0, 0, 120);
-//	  }
 
 	  // sprintf(str,"dummy3=%u \t old_dummy3=%u \t delta3=%u\n\r",dummy3, old_dummy3, (dummy3-old_dummy3)&0x0FFF);
 	  //serial_puts(str);
