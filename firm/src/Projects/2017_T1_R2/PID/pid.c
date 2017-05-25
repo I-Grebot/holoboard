@@ -247,6 +247,13 @@ void PID_Process_holonomic(PID_process_t *pPIDx,PID_process_t *pPIDy,PID_process
     safe_setpwm(pPIDteta->set_pwm, pPIDteta->pwm_channel,(int16_t)motor3_speed);
 }
 
+void PID_Pause_holonomic(PID_process_t *pPIDx,PID_process_t *pPIDy,PID_process_t *pPIDteta)
+{
+	safe_setpwm(pPIDx->set_pwm, pPIDx->pwm_channel,(int16_t)0);
+	safe_setpwm(pPIDy->set_pwm, pPIDy->pwm_channel,(int16_t)0);
+	safe_setpwm(pPIDteta->set_pwm, pPIDteta->pwm_channel,(int16_t)0);
+}
+
 void PID_Set_Coefficient(PID_struct_t *PID,int8_t KP,int8_t KI,int8_t KD,uint32_t I_limit){
     // Set coefficients
     PID->KP = KP;

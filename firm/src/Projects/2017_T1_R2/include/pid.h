@@ -68,6 +68,7 @@ int32_t PID_Process(PID_struct_t *PID, int32_t error);
 void PID_Process_Speed(PID_process_t *sPID, uint32_t position);
 void PID_Process_Position(PID_process_t *pPID, PID_process_t *sPID, int32_t position);
 void PID_Process_holonomic(PID_process_t *pPIDx,PID_process_t *pPIDy,PID_process_t *pPIDteta);
+void PID_Pause_holonomic(PID_process_t *pPIDx,PID_process_t *pPIDy,PID_process_t *pPIDteta);
 void PID_Set_Coefficient(PID_struct_t *PID,int8_t KP,int8_t KI,int8_t KD,uint32_t I_limit);
 void PID_Reset(PID_process_t *xPID);
 int32_t PID_Manage_limitation(PID_process_t *xPID, int32_t param);

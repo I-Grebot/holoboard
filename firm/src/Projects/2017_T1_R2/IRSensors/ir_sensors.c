@@ -8,14 +8,19 @@
 
 /* Inclusion */
 #include "main.h"
+#include "ir_sensors.h"
 
-static int16_t sensor0, sensor1, sensor2;
+uint8_t sensor0, sensor1, sensor2;
 
 /* Local, Private functions */
 static void OS_IrSensorsTask(void *pvParameters);
 
 BaseType_t ir_sensor_start(void)
 {
+	sensor0 = 0;
+	sensor1 = 0;
+	sensor2 = 0;
+
     return xTaskCreate(OS_IrSensorsTask, "IrSensor", OS_TASK_STACK_IR_SENSORS, NULL, OS_TASK_PRIORITY_IR_SENSORS, NULL );
 }
 

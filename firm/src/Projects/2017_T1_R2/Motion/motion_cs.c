@@ -15,6 +15,7 @@
  */
 
 #include "main.h"
+#include "ir_sensors.h"
 #include "pid.h"
 
 /* Local definitions */
@@ -259,6 +260,8 @@ void motion_cs_task(void *pvParameters)
 
   uint16_t timer=0;
 
+  uint8_t should_use_irsensor_0 = 0;
+
   is_started = 0;
   is_init = 0;
 
@@ -330,16 +333,29 @@ void motion_cs_task(void *pvParameters)
   for( ;; )
   {
 	  led_set_mode(HB_LED_GREEN);
-	  PID_Process_holonomic(pPID_1, pPID_2, pPID_3);
+
+	  if(should_use_irsensor_0 == 0 || (should_use_irsensor_0 == 1 && sensor0 == 0))
+	  {
+		  PID_Process_holonomic(pPID_1, pPID_2, pPID_3);
+	  }
+	  else
+	  {
+		  PID_Pause_holonomic(pPID_1, pPID_2, pPID_3);
+	  }
+
 	  timer++;
 
-	  go_to_position_relative_metric(0, 1000, 0);
-
-	  if(timer == 200) {
-		  go_to_position_relative_metric(0, 1000, 90);
+	  if(timer == 0)
+	  {
+		  go_to_position_relative_metric(0, 1000, 0);
 	  }
+
+//	  if(timer == 200) {
+//		  go_to_position_relative_metric(0, 1000, 90);
+//	  }
 	  if(timer == 300) {
-		  go_to_position_relative_metric(0, 500, 90);
+		  //should_use_irsensor_0 = 1;
+		  go_to_position_relative_metric(0, 3000, 0);
 	  }
 
 //	  if(timer==100)
