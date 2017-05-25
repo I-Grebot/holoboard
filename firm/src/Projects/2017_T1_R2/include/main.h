@@ -103,11 +103,13 @@
  */
 #define OS_TASK_PRIORITY_LED          ( tskIDLE_PRIORITY + 2 )
 #define OS_TASK_PRIORITY_MOTION_CS    ( tskIDLE_PRIORITY + 4 )
+#define OS_TASK_PRIORITY_IR_SENSORS   ( tskIDLE_PRIORITY + 4 )
 /*
  * OS Tasks Stacks sizes, in bytes
  */
 #define OS_TASK_STACK_LED               configMINIMAL_STACK_SIZE
 #define OS_TASK_STACK_MOTION_CS         500
+#define OS_TASK_STACK_IR_SENSORS        500
 
  /* NVIC Priorities. Lower value means higher priority.
   * Beware to use priorities smaller than configLIBRARY_LOWEST_INTERRUPT_PRIORITY

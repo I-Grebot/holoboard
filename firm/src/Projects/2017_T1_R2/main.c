@@ -36,6 +36,7 @@ int main( void )
 
   led_start();
   motion_cs_start();
+  ir_sensor_start();
 
   /* Start FreeRTOS Scheduler */
   vTaskStartScheduler();
