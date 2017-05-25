@@ -312,11 +312,11 @@ void motion_cs_task(void *pvParameters)
   led_set_color(HB_LED_RED);
   while(is_init == 0)
   {
-	  if(ENDSTOP0_VALUE == HAS_TIRETTE)
+	  if(ENDSTOP1_VALUE == HAS_TIRETTE)
 	  {
 		  //wait and check tirette status again to debounce
 		  vTaskDelayUntil( &xNextWakeTime, 100);
-		  if(ENDSTOP0_VALUE == HAS_TIRETTE)
+		  if(ENDSTOP1_VALUE == HAS_TIRETTE)
 		  {
 			  led_set_color(HB_LED_BLUE);
 			  is_init = 1;
@@ -328,7 +328,7 @@ void motion_cs_task(void *pvParameters)
 
   while(is_started == 0)
   {
-	  if(ENDSTOP0_VALUE != HAS_TIRETTE)
+	  if(ENDSTOP1_VALUE != HAS_TIRETTE)
 	  {
 		  is_started = 1;
 		  LCMXO2_RESET_WRITE(LCMXO2_RESET_OFF);
@@ -347,15 +347,18 @@ void motion_cs_task(void *pvParameters)
 	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
 	  //    3 1 5
 
+	  if(timer == 0) {
+		  go_to_position_relative_metric(0, 0, 0);
+	  }
 	  if(timer == (5000/MOTION_CONTROL_PERIOD_TICKS))
 	  {
-		  should_use_irsensor_0 = 0;
-		  should_use_irsensor_1 = 0;
-		  should_use_irsensor_2 = 1;
+		  should_use_irsensor_0 = 1;
+		  should_use_irsensor_1 = 1;
+		  should_use_irsensor_2 = 0;
 
-		  should_use_irsensor_3 = 1;
-		  should_use_irsensor_4 = 1;
-		  should_use_irsensor_5 = 0;
+		  should_use_irsensor_3 = 0;
+		  should_use_irsensor_4 = 0;
+		  should_use_irsensor_5 = 1;
 		  go_to_position_relative_metric(0, -1000, 0);
 	  }
 	  if(timer == (9000/MOTION_CONTROL_PERIOD_TICKS))
@@ -372,13 +375,13 @@ void motion_cs_task(void *pvParameters)
 	  }
 	  if(timer == (11000/MOTION_CONTROL_PERIOD_TICKS))
 	  {
-		  should_use_irsensor_0 = 0;
-		  should_use_irsensor_1 = 0;
-		  should_use_irsensor_2 = 1;
+		  should_use_irsensor_0 = 1;
+		  should_use_irsensor_1 = 1;
+		  should_use_irsensor_2 = 0;
 
-		  should_use_irsensor_3 = 1;
-		  should_use_irsensor_4 = 1;
-		  should_use_irsensor_5 = 0;
+		  should_use_irsensor_3 = 0;
+		  should_use_irsensor_4 = 0;
+		  should_use_irsensor_5 = 1;
 		  go_to_position_relative_metric(0, -1000-1500, 0);
 	  }
 

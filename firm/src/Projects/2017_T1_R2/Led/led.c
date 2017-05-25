@@ -18,9 +18,6 @@
 /* Inclusion */
 #include "main.h"
 
-static const char * const welcomeMessage  = WELCOME_MESSAGE;
-
-
 /* Local Variable Mutex */
 static xSemaphoreHandle xLedColorMutex;
 static xSemaphoreHandle xLedModeMutex;

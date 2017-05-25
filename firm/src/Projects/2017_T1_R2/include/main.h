@@ -170,6 +170,9 @@ int serial_printf(const char * restrict format, ... );
  * -----------------------------------------------------------------------------
  */
 
+/* IR Sensors System */
+BaseType_t ir_sensor_start(void);
+
 /* Motion Control System */
 BaseType_t motion_cs_start(void);
 void motor1_set_speed(int speed);
