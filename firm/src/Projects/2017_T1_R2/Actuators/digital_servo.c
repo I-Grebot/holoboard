@@ -35,6 +35,10 @@ dsv_channel_t dsv_chan2;
 /* Definition */
 #define MAX_DSV_IN_QUEUE	5
 
+#define XL320_GRABBER_OPEN 		350
+#define XL320_GRABBER_CLOSED 	840
+
+
 /* Local structures */
 // TODO: UNUSED
 typedef struct {
@@ -420,16 +424,16 @@ static void OS_DSVTask( void *pvParameters )
 //    	vTaskDelay(5/portTICK_RATE_MS);
 //    	xl_320_set_led(DSV_To_Manage.id, XL_320_LED_BLUE);
 //    }
-    vTaskDelayUntil( &xNextWakeTime, 500);
+//    vTaskDelayUntil( &xNextWakeTime, 500);
     servo1.id=80;
 	vTaskDelayUntil( &xNextWakeTime, 500);
 	dxl_set_led(&servo1,DXL_LED_BLUE);
 	vTaskDelayUntil( &xNextWakeTime, 500);
-	dxl_set_position(&servo1,350);
-	vTaskDelayUntil( &xNextWakeTime, 2000);
-	dxl_set_position(&servo1,840);
-	vTaskDelayUntil( &xNextWakeTime, 2000);
-	dxl_set_position(&servo1,350);
+//	dxl_set_position(&servo1,XL320_GRABBER_OPEN);
+//	vTaskDelayUntil( &xNextWakeTime, 2000);
+//	dxl_set_position(&servo1,XL320_GRABBER_CLOSED);
+//	vTaskDelayUntil( &xNextWakeTime, 2000);
+//	dxl_set_position(&servo1,XL320_GRABBER_OPEN);
     for (;;)
     {
 
@@ -437,6 +441,15 @@ static void OS_DSVTask( void *pvParameters )
 
 }
 
+void dsv_open_grabber() {
+	dxl_set_position(&servo1,XL320_GRABBER_OPEN);
+	dxl_set_led(&servo1,DXL_LED_BLUE);
+}
+
+void dsv_close_grabber() {
+	dxl_set_position(&servo1,XL320_GRABBER_CLOSED);
+	dxl_set_led(&servo1,DXL_LED_YELLOW);
+}
 /*
 void DSV_Create(DSV_ControlTypeDef* DSV, uint8_t id, uint16_t min_Position, uint16_t max_Position)
 {

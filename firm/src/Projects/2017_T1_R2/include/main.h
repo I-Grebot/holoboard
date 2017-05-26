@@ -166,6 +166,8 @@ uint8_t dsv_put(uint8_t chan_idx, uint8_t tx_data);
 uint8_t dsv_get(uint8_t chan_idx, const uint8_t* data);
 uint8_t dsv_flush(uint8_t chan_idx);
 BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength);
+void dsv_open_grabber();
+void dsv_close_grabber();
 
 /* RGB LED */
 BaseType_t led_start(void);

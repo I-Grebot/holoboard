@@ -273,6 +273,36 @@ void set_irsensors_for_moving_toward_y_axis(){
 	should_use_irsensor_5 = 0;
 }
 
+void set_irsensors_for_moving_backward_y_axis(){
+	should_use_irsensor_0 = 0;
+	should_use_irsensor_1 = 0;
+	should_use_irsensor_2 = 1;
+
+	should_use_irsensor_3 = 0;
+	should_use_irsensor_4 = 0;
+	should_use_irsensor_5 = 0;
+}
+
+void set_irsensors_for_moving_toward_x_axis(){
+	should_use_irsensor_0 = 0;
+	should_use_irsensor_1 = 1;
+	should_use_irsensor_2 = 0;
+
+	should_use_irsensor_3 = 0;
+	should_use_irsensor_4 = 1;
+	should_use_irsensor_5 = 0;
+}
+
+void set_irsensors_for_moving_backward_x_axis(){
+	should_use_irsensor_0 = 1;
+	should_use_irsensor_1 = 0;
+	should_use_irsensor_2 = 0;
+
+	should_use_irsensor_3 = 0;
+	should_use_irsensor_4 = 0;
+	should_use_irsensor_5 = 1;
+}
+
 void deactivate_all_sensors(){
 	should_use_irsensor_0 = 0;
 	should_use_irsensor_1 = 0;
@@ -281,6 +311,28 @@ void deactivate_all_sensors(){
 	should_use_irsensor_3 = 0;
 	should_use_irsensor_4 = 0;
 	should_use_irsensor_5 = 0;
+}
+
+void activate_all_sensors(){
+	should_use_irsensor_0 = 1;
+	should_use_irsensor_1 = 1;
+	should_use_irsensor_2 = 1;
+
+	should_use_irsensor_3 = 1;
+	should_use_irsensor_4 = 1;
+	should_use_irsensor_5 = 1;
+}
+
+void set_limitation_normal() {
+  PID_Set_limitation(pPID_1,700,75);
+  PID_Set_limitation(pPID_2,700,75);
+  PID_Set_limitation(pPID_3,500,20);
+}
+
+void set_limitation_slow() {
+  PID_Set_limitation(pPID_1,350,75);
+  PID_Set_limitation(pPID_2,350,75);
+  PID_Set_limitation(pPID_3,250,20);
 }
 
 /* -----------------------------------------------------------------------------
@@ -295,7 +347,8 @@ void motion_cs_task(void *pvParameters)
 
   uint16_t timer=0;
   uint16_t timer_delay = 0;
-  uint16_t start_delay = 0;
+  uint16_t start_delay = 5000;
+  uint16_t timer_offset = 0;
 
   uint8_t is_yellow = 0;
 
@@ -390,12 +443,15 @@ void motion_cs_task(void *pvParameters)
 	  //	  5
 	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
 	  //      1 4
+	  timer_offset = 0;
 
 	  if(timer == 0) {
 		  go_to_position_relative_metric(0, 0, 0);
+		  dsv_open_grabber();
 	  }
+	  timer_offset += 100;
 	  //go out of departure area
-	  if(timer == ((100+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
 		  set_irsensors_for_moving_toward_y_axis();
 
@@ -405,48 +461,204 @@ void motion_cs_task(void *pvParameters)
 
 		  go_to_position_relative_metric(0, 900, 0);
 	  }
-	  //turn 90degrees
-	  if(timer == ((4000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  timer_offset += 4000;
+
+	  //offset from the rocket
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  if (is_yellow)
+		  {
+			  set_irsensors_for_moving_backward_x_axis();
+		  }
+		  else
+		  {
+			  set_irsensors_for_moving_toward_x_axis();
+		  }
+
+		  go_to_position_relative_metric(is_yellow ? -100 : 100, 900, 0);
+	  }
+	  timer_offset += 2000;
+
+	  //go to middle of the table (1,5m)
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  set_irsensors_for_moving_toward_y_axis();
+
+		  //sould not detect wall
+		  should_use_irsensor_0 = is_yellow ? 1 : 0;
+		  should_use_irsensor_1 = is_yellow ? 0 : 1;
+
+		  go_to_position_relative_metric(is_yellow ? -100 : 100, 1500, 0);
+	  }
+	  timer_offset += 3000;
+
+	  //turn 90deg
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
 		  deactivate_all_sensors();
 
-		  go_to_position_relative_metric(0, 900, is_yellow ? -90 : 90);
+		  go_to_position_relative_metric(is_yellow ? -100 : 100, 1500, is_yellow ? -90 : 90);
 	  }
+	  timer_offset += 2000;
+
 	  //fix position using wall
-	  if(timer == ((6000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  //encoder_set_position(0, 900, 0);
+		  set_limitation_slow();
+		  deactivate_all_sensors();
+
+		  go_to_position_relative_metric(is_yellow ? -100 : 100, 0, is_yellow ? -90 : 90);
+	  }
+	  timer_offset += 3000;
+
+	  //fix position using rocket
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  set_limitation_slow();
+		  encoder_set_position(0, 0, 0);
+
+		  deactivate_all_sensors();
+
+		  go_to_position_relative_metric(is_yellow ? -500 : 500, 0, 0);
+	  }
+	  timer_offset += 3000;
+
+	  //offset from rocket
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  set_limitation_normal();
+		  encoder_set_position(0, 0, 0);
+
+		  deactivate_all_sensors();
+
+		  go_to_position_relative_metric(is_yellow ? 50 : -50, 50, 0);
+	  }
+	  timer_offset += 3000;
+
+	  //face tube
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
 
 		  set_irsensors_for_moving_toward_y_axis();
 
-		  go_to_position_relative_metric(0, 0, is_yellow ? -90 : 90);
+		  go_to_position_relative_metric(0, 0, is_yellow ? 45 : -45);
 	  }
+	  timer_offset += 1000;
+
 	  //go near tube
-	  if(timer == ((8000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
 		  encoder_set_position(0, 0, 0);
 
 		  set_irsensors_for_moving_toward_y_axis();
 
-		  go_to_position_relative_metric(0, 300, 0);
+		  go_to_position_relative_metric(0, 1500, 0);
 	  }
-	  //turn left
-	  if(timer == ((10000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  timer_offset += 4000;
+
+	  //little finger face the tube
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
 		  encoder_set_position(0, 0, 0);
 
-		  set_irsensors_for_moving_toward_y_axis();
+		  activate_all_sensors();
 
-		  go_to_position_relative_metric(0, 0, is_yellow ? 90 : -90);
+		  go_to_position_relative_metric(0, 0, is_yellow ? -145 : 145);
 	  }
-	  //turn around tube
-	  if(timer == ((12000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  timer_offset += 2000;
+
+	  //little finger touch the tube
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
+
+		  activate_all_sensors();
+
+		  go_to_position_relative_metric(0, -100, 0);
+	  }
+	  timer_offset += 2000;
+
+	  //close little finger
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  dsv_close_grabber();
+	  }
+	  timer_offset += 1000;
+
+	  //face team zone
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
+
+		  activate_all_sensors();
+
+		  go_to_position_relative_metric(0, 0, is_yellow ? -30 : 30);
+	  }
+	  timer_offset += 1000;
+
+	  //go near team zone
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
 		  encoder_set_position(0, 0, 0);
 
 		  set_irsensors_for_moving_toward_y_axis();
 
-		  go_to_position_relative_metric(0, 250, 270);
+		  go_to_position_relative_metric(0, 1300, 0);
+	  }
+	  timer_offset += 4000;
+
+	  //go near near near near team zone ignoring rocket sided sensor
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
+
+		  set_irsensors_for_moving_toward_y_axis();
+
+		  //sould not detect wall
+		  should_use_irsensor_0 = is_yellow ? 0 : 1;
+		  should_use_irsensor_1 = is_yellow ? 1 : 0;
+
+		  go_to_position_relative_metric(0, 400, 0);
+	  }
+	  timer_offset += 3000;
+
+	  //turn 180
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
+
+		  deactivate_all_sensors();
+
+		  go_to_position_relative_metric(0, 0, 180);
+	  }
+	  timer_offset += 2000;
+
+	  //drop the bass
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  dsv_open_grabber();
+	  }
+	  timer_offset += 1000;
+
+	  //turn a little bit
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
+
+		  set_irsensors_for_moving_toward_y_axis();
+
+		  go_to_position_relative_metric(0, 0, is_yellow ? -30 : 30);
+	  }
+
+	  //run away
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
+
+		  set_irsensors_for_moving_toward_y_axis();
+
+		  go_to_position_relative_metric(0, 500, 0);
 	  }
 
 	  //
