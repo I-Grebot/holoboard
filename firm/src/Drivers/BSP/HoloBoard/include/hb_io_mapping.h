@@ -391,6 +391,34 @@
 
 
 /**
+********************************************************************************
+**
+**  Digital Servomotors Main channel or channel 1
+**    1x Bi-directionnal UART
+**
+********************************************************************************
+*/
+
+/** @addtogroup BB_LOW_LEVEL_DSV_CHAN1
+ * @{
+ */
+
+/* Definitions for DSV UART connected on UART5 */
+#define DSV_COM                         UART5
+#define DSV_CLK_ENABLE()                RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5, ENABLE)
+#define DSV_CLK_DISABLE()               RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5, DISABLE)
+#define DSV_IRQn                        UART5_IRQn
+#define DSV_ISR                         UART5_IRQHandler
+
+/* DSV_TXRX Mapped on PD2 */
+#define DSV_TXRX_GPIO_PORT              GPIOD
+#define DSV_TXRX_PIN                    GPIO_Pin_2
+#define DSV_TXRX_GPIO_CLK_ENABLE()      RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE)
+#define DSV_TXRX_GPIO_CLK_DISABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, DISABLE)
+#define DSV_TXRX_AF                     GPIO_AF8_UART5
+#define DSV_TXRX_PIN_SOURCE             GPIO_PinSource2
+
+/**
  * @}
  */
 

@@ -28,8 +28,9 @@
 int main( void )
 {
 
-  /* HoloBoard Initializations */;
+  /* HoloBoard Initializations */
    hb_init();
+   dsv_init();
 
   // Serial is started first to ensure correct print outs
   serial_init();
@@ -37,6 +38,7 @@ int main( void )
   led_start();
   motion_cs_start();
   ir_sensor_start();
+  dsv_start();
 
   /* Start FreeRTOS Scheduler */
   vTaskStartScheduler();

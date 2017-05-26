@@ -41,6 +41,9 @@
 /* External configuration of the BlueBoard */
 #include "hb_config.h"
 
+/* Components libraries */
+#include "dynamixel.h"
+
 
  /**
  ********************************************************************************
@@ -99,6 +102,12 @@ typedef enum {
     HB_TURRET_FRAME_ACTIVE = (Bit_RESET)
 } HB_HMI_FrameTypeDef;
 
+/* List of available Digital Servo channels */
+typedef enum {
+    HB_DSV_CHANNEL1 = 1,
+	HB_DSV_CHANNEL2 = 2
+} HB_DSV_ChannelTypeDef;
+
 /**
 ********************************************************************************
 **
@@ -143,6 +152,13 @@ void hb_dbg_disable(void);
 
 /* IR Sensors */
 void hb_irsensor_init(void);
+
+/* Digital Servo */
+void hb_dsv_init(uint8_t dsv_chan, USART_InitTypeDef * USART_InitStruct);
+void hb_dsv_enable(uint8_t dsv_chan, uint32_t nvic_priority);
+void hb_dsv_disable(uint8_t dsv_chan);
+void hb_dsv_switch(uint8_t dsv_chan, dxl_switch_mode_e mode);
+void hb_dsv_put(uint8_t dsv_chan, uint8_t ch);
 
 #ifdef __cplusplus
 }

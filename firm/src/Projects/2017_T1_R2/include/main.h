@@ -68,7 +68,7 @@
 
 /* Project files */
 #include "hardware_const.h"
-
+#include "digital_servo.h"
 
  /**
  ********************************************************************************
@@ -104,6 +104,8 @@
 #define OS_TASK_PRIORITY_LED          ( tskIDLE_PRIORITY + 2 )
 #define OS_TASK_PRIORITY_MOTION_CS    ( tskIDLE_PRIORITY + 4 )
 #define OS_TASK_PRIORITY_IR_SENSORS   ( tskIDLE_PRIORITY + 4 )
+#define OS_TASK_PRIORITY_DSV          ( tskIDLE_PRIORITY + 2 )
+
 /*
  * OS Tasks Stacks sizes, in bytes
  */
@@ -117,6 +119,7 @@
   * ISR Save FreeRTOS API Routines!
   */
 #define OS_ISR_PRIORITY_SER             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 1 )
+#define OS_ISR_PRIORITY_DSV             ( configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY + 2 )
 
  /*
   * Events periodicity
@@ -151,6 +154,18 @@ void sys_get_run_time_stats(char *pcWriteBuffer);
  * Hardware Management
  * -----------------------------------------------------------------------------
  */
+
+// -----------------------------------------------------------------------------
+// Digital Servos
+// -----------------------------------------------------------------------------
+
+BaseType_t dsv_start(void);
+void dsv_init(void);
+void dsv_update_config(void);
+uint8_t dsv_put(uint8_t chan_idx, uint8_t tx_data);
+uint8_t dsv_get(uint8_t chan_idx, const uint8_t* data);
+uint8_t dsv_flush(uint8_t chan_idx);
+BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength);
 
 /* RGB LED */
 BaseType_t led_start(void);

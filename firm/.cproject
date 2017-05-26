@@ -17,8 +17,9 @@
 						<toolChain id="com.atollic.truestudio.exe.debug.toolchain.834852621" name="Atollic ARM Tools" superClass="com.atollic.truestudio.exe.debug.toolchain">
 							<option id="com.atollic.truestudio.toolchain_options.mcu.2129679958" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" useByScannerDiscovery="false" value="STM32F746VG" valueType="string"/>
 							<option id="com.atollic.truestudio.toolchain_options.vendor.1630645889" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" useByScannerDiscovery="false" value="STMicroelectronics" valueType="string"/>
+							<option id="com.atollic.truestudio.general.runtimelib.603697412" name="Runtime Library" superClass="com.atollic.truestudio.general.runtimelib" value="com.atollic.truestudio.ld.general.clib.standard" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.debug.toolchain.platform.441310055" isAbstract="false" name="Debug platform" osList="all" superClass="com.atollic.truestudio.exe.debug.toolchain.platform"/>
-							<builder buildPath="${workspace_loc:/holoboard}/Debug" customBuilderProperties="toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for ARM 7.1.2\\ARMTools\\bin|toolChainpathType=1|" id="com.atollic.truestudio.mbs.builder1.124225316" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="optimal" stopOnErr="true" superClass="com.atollic.truestudio.mbs.builder1"/>
+							<builder buildPath="${workspace_loc:/holoboard}/Debug" customBuilderProperties="toolChainpathType=1|toolChainpathString=/opt/Atollic_TrueSTUDIO_for_ARM_8.0.0/ARMTools/bin|" id="com.atollic.truestudio.mbs.builder1.124225316" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" parallelBuildOn="true" parallelizationNumber="optimal" stopOnErr="true" superClass="com.atollic.truestudio.mbs.builder1"/>
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.as.553307052" name="Assembler" superClass="com.atollic.truestudio.exe.debug.toolchain.as">
 								<option id="com.atollic.truestudio.common_options.target.endianess.148937508" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.1470824128" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F746VG" valueType="enumerated"/>
@@ -46,6 +47,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS/portable/GCC/ARM_CM7/r0p1}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/Middlewares/FreeRTOS-Plus/FreeRTOS-Plus-CLI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/Projects/2017_T1_R2/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/holoboard/src/Drivers/BSP/Components/dynamixel/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/holoboard/src/Drivers/BSP/Components/xl_320/include}&quot;"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.1618864532" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.1496825217" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F746VG" valueType="enumerated"/>
@@ -105,8 +108,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src|vhdl" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
-						<entry excluding="Middlewares/FreeRTOS/portable/MemMang/heap_1.c|Middlewares/FreeRTOS/portable/MemMang/heap_2.c|Middlewares/FreeRTOS/portable/MemMang/heap_3.c|Middlewares/FreeRTOS/portable/MemMang/heap_5.c|Drivers/SPL/stm32f7xx_cryp_aes.c|Drivers/SPL/stm32f7xx_cryp_des.c|Drivers/SPL/stm32f7xx_cryp_tdes.c|Drivers/SPL/stm32f7xx_cryp.c|Drivers/SPL/stm32f7xx_hash_md5.c|Drivers/SPL/stm32f7xx_hash_sha1.c|Drivers/SPL/stm32f7xx_hash.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="vhdl|src" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+						<entry excluding="Drivers/SPL/stm32f7xx_hash_sha1.c|Drivers/SPL/stm32f7xx_hash_md5.c|Drivers/SPL/stm32f7xx_cryp_tdes.c|Drivers/SPL/stm32f7xx_cryp_aes.c|Middlewares/FreeRTOS/portable/MemMang/heap_1.c|Middlewares/FreeRTOS/portable/MemMang/heap_2.c|Middlewares/FreeRTOS/portable/MemMang/heap_3.c|Middlewares/FreeRTOS/portable/MemMang/heap_5.c|Drivers/SPL/stm32f7xx_cryp_des.c|Drivers/SPL/stm32f7xx_hash.c|Drivers/SPL/stm32f7xx_cryp.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -128,8 +131,9 @@
 						<toolChain id="com.atollic.truestudio.exe.release.toolchain.49656429" name="Atollic ARM Tools" superClass="com.atollic.truestudio.exe.release.toolchain">
 							<option id="com.atollic.truestudio.toolchain_options.mcu.343257338" name="Microcontroller" superClass="com.atollic.truestudio.toolchain_options.mcu" useByScannerDiscovery="false" value="STM32F746VG" valueType="string"/>
 							<option id="com.atollic.truestudio.toolchain_options.vendor.987796171" name="Vendor name" superClass="com.atollic.truestudio.toolchain_options.vendor" useByScannerDiscovery="false" value="STMicroelectronics" valueType="string"/>
+							<option id="com.atollic.truestudio.general.runtimelib.1625370438" name="Runtime Library" superClass="com.atollic.truestudio.general.runtimelib" value="com.atollic.truestudio.ld.general.clib.standard" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="com.atollic.truestudio.exe.release.toolchain.platform.504864237" isAbstract="false" name="release platform" superClass="com.atollic.truestudio.exe.release.toolchain.platform"/>
-							<builder buildPath="${workspace_loc:/holoboard}/Release" customBuilderProperties="toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for ARM 7.1.2\\ARMTools\\bin|toolChainpathType=1|" id="com.atollic.truestudio.mbs.builder1.1162125515" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1"/>
+							<builder buildPath="${workspace_loc:/holoboard}/Release" customBuilderProperties="toolChainpathType=1|toolChainpathString=C:\\Program Files (x86)\\Atollic\\TrueSTUDIO for ARM 7.1.2\\ARMTools\\bin|" id="com.atollic.truestudio.mbs.builder1.1162125515" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="com.atollic.truestudio.mbs.builder1"/>
 							<tool id="com.atollic.truestudio.exe.release.toolchain.as.1935585222" name="Assembler" superClass="com.atollic.truestudio.exe.release.toolchain.as">
 								<option id="com.atollic.truestudio.common_options.target.endianess.140897900" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess" useByScannerDiscovery="false"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.1867267069" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" useByScannerDiscovery="false" value="STM32F746VG" valueType="enumerated"/>
@@ -216,8 +220,8 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src|src/Middlewares/FreeRTOS/portable/MemMang|vhdl" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="Middlewares/FreeRTOS/portable/MemMang/heap_1.c|Middlewares/FreeRTOS/portable/MemMang/heap_2.c|Middlewares/FreeRTOS/portable/MemMang/heap_3.c|Middlewares/FreeRTOS/portable/MemMang/heap_5.c|Drivers/SPL/stm32f7xx_cryp_aes.c|Drivers/SPL/stm32f7xx_cryp_des.c|Drivers/SPL/stm32f7xx_cryp_tdes.c|Drivers/SPL/stm32f7xx_cryp.c|Drivers/SPL/stm32f7xx_hash_md5.c|Drivers/SPL/stm32f7xx_hash_sha1.c|Drivers/SPL/stm32f7xx_hash.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="vhdl|src|src/Middlewares/FreeRTOS/portable/MemMang" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="Drivers/SPL/stm32f7xx_hash_sha1.c|Drivers/SPL/stm32f7xx_hash_md5.c|Drivers/SPL/stm32f7xx_cryp_tdes.c|Drivers/SPL/stm32f7xx_cryp_aes.c|Middlewares/FreeRTOS/portable/MemMang/heap_1.c|Middlewares/FreeRTOS/portable/MemMang/heap_2.c|Middlewares/FreeRTOS/portable/MemMang/heap_3.c|Middlewares/FreeRTOS/portable/MemMang/heap_5.c|Drivers/SPL/stm32f7xx_cryp_des.c|Drivers/SPL/stm32f7xx_hash.c|Drivers/SPL/stm32f7xx_cryp.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
