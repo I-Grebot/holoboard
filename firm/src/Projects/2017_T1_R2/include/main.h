@@ -55,6 +55,10 @@
 #include <sys/time.h>
 #include <sys/times.h>
 #include <string.h>
+//#include "strategy.h"
+#include "angle_distance.h"
+#include "robot_system.h"
+#include "motion.h"
 
 /* Board-Support Package Drivers */
 #include "holoboard.h"

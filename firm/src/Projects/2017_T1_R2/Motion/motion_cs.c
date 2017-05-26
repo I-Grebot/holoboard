@@ -335,6 +335,7 @@ void set_limitation_slow() {
   PID_Set_limitation(pPID_3,250,20);
 }
 
+
 /* -----------------------------------------------------------------------------
  * Main Motion Control System Managment Task
  * TODO: handle re-init of the task
@@ -343,6 +344,12 @@ void set_limitation_slow() {
 
 void motion_cs_task(void *pvParameters)
 {
+  /* Static local variables */
+  static int32_t old_a        = 0;
+  static int32_t old_d        = 0;
+  static int32_t old_speed_a  = 0;
+  static int32_t old_speed_d  = 0;
+
   TickType_t xNextWakeTime;
 
   uint16_t timer=0;
@@ -434,7 +441,7 @@ void motion_cs_task(void *pvParameters)
 
 	  vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS);
   }
-
+  timer_offset = 0;
   for( ;; )
   {
 	//  led_set_mode(HB_LED_BLINK_SLOW);
@@ -443,7 +450,10 @@ void motion_cs_task(void *pvParameters)
 	  //	  5
 	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
 	  //      1 4
-	  timer_offset = 0;
+
+
+      // Manage Robot System
+      rs_update(&robot.cs.rs);
 
 	  if(timer == 0) {
 		  go_to_position_relative_metric(0, 0, 0);
