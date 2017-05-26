@@ -51,6 +51,7 @@ void hb_turret_init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_InitStructure.GPIO_Speed = GPIO_High_Speed; /* 10 MHz */
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
 	GPIO_Init(TURRET_CSN_GPIO_PORT, &GPIO_InitStructure);
 
 	/* Default SPI Configuration */
@@ -60,7 +61,7 @@ void hb_turret_init(void)
 	SPI_InitStruct.SPI_Mode = SPI_Mode_Master;
 	SPI_InitStruct.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
 	SPI_InitStruct.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256; /* TBC */
-	SPI_InitStruct.SPI_DataSize = SPI_DataSize_8b;
+	SPI_InitStruct.SPI_DataSize = SPI_DataSize_16b;
 	SPI_InitStruct.SPI_CPHA = SPI_CPHA_1Edge;
 	SPI_InitStruct.SPI_CPOL = SPI_CPOL_Low;
 	SPI_InitStruct.SPI_NSS = SPI_NSS_Soft | SPI_NSSInternalSoft_Set; // Internal NSS mgmt and pull internal NSS high;
