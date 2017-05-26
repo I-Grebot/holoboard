@@ -134,7 +134,7 @@ void hb_lcmxo2_set_pwm(uint16_t motor, int16_t value);
 int16_t hb_lcmxo2_get_qei(uint16_t encoder);
 
 /* Turret */
-void hc_turret_init(void);
+void hb_turret_init(void);
 
 /* Debug Interface */
 void hb_dbg_init(USART_InitTypeDef * USART_InitStruct);
@@ -143,6 +143,9 @@ void hb_dbg_disable(void);
 
 /* IR Sensors */
 void hb_irsensor_init(void);
+
+/* Endstop */
+void hb_endstop_init(void);
 
 #ifdef __cplusplus
 }
