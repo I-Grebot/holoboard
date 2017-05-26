@@ -24,4 +24,16 @@ void hb_endstop_init(void)
 
 	GPIO_InitStructure.GPIO_Pin = ENDSTOP1_PIN;
 	GPIO_Init(ENDSTOP1_GPIO_PORT, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = ENDSTOP2_PIN;
+	GPIO_Init(ENDSTOP2_GPIO_PORT, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = ENDSTOP3_PIN;
+	GPIO_Init(ENDSTOP3_GPIO_PORT, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = ENDSTOP4_PIN;
+	GPIO_Init(ENDSTOP4_GPIO_PORT, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = ENDSTOP5_PIN;
+	GPIO_Init(ENDSTOP5_GPIO_PORT, &GPIO_InitStructure);
 }

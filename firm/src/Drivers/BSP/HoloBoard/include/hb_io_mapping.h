@@ -292,6 +292,36 @@
 #define ENDSTOP1_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
 #define ENDSTOP1_VALUE                 GPIO_ReadInputDataBit(ENDSTOP1_GPIO_PORT, ENDSTOP1_PIN)
 
+/* END Stop 2 */
+#define ENDSTOP2_GPIO_PORT             GPIOE
+#define ENDSTOP2_PIN                   GPIO_Pin_12
+#define ENDSTOP2_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define ENDSTOP2_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define ENDSTOP2_VALUE                 GPIO_ReadInputDataBit(ENDSTOP2_GPIO_PORT, ENDSTOP2_PIN)
+
+/* END Stop 3 */
+#define ENDSTOP3_GPIO_PORT             GPIOE
+#define ENDSTOP3_PIN                   GPIO_Pin_13
+#define ENDSTOP3_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define ENDSTOP3_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define ENDSTOP3_VALUE                 GPIO_ReadInputDataBit(ENDSTOP3_GPIO_PORT, ENDSTOP3_PIN)
+
+/* END Stop 4 */
+#define ENDSTOP4_GPIO_PORT             GPIOE
+#define ENDSTOP4_PIN                   GPIO_Pin_14
+#define ENDSTOP4_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define ENDSTOP4_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define ENDSTOP4_VALUE                 GPIO_ReadInputDataBit(ENDSTOP4_GPIO_PORT, ENDSTOP4_PIN)
+
+/* END Stop 5 */
+#define ENDSTOP5_GPIO_PORT             GPIOE
+#define ENDSTOP5_PIN                   GPIO_Pin_15
+#define ENDSTOP5_GPIO_CLK_ENABLE()     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE)
+#define ENDSTOP5_GPIO_CLK_DISABLE()    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, DISABLE)
+#define ENDSTOP5_VALUE                 GPIO_ReadInputDataBit(ENDSTOP5_GPIO_PORT, ENDSTOP5_PIN)
+
+
+/* POWER */
 
 /* Number of instances */
 #define PWRn                               ((uint8_t) 3)

@@ -39,6 +39,7 @@
 #define CALIB_SCALER 100000
 
 #define HAS_TIRETTE	1
+#define IS_YELLOW 1
 
 /* Local, Private functions */
 static void motion_cs_task(void *pvParameters);
@@ -47,6 +48,14 @@ static int32_t encoder1_Value=0,encoder2_Value=0,encoder3_Value=0;
 
 static int32_t ratio_x_mm_per_ticks, ratio_y_mm_per_ticks, ratio_teta_degree_per_ticks;
 static int16_t is_started, is_init;
+
+static uint8_t should_use_irsensor_0;
+static uint8_t should_use_irsensor_1;
+static uint8_t should_use_irsensor_2;
+
+static uint8_t should_use_irsensor_3;
+static uint8_t should_use_irsensor_4;
+static uint8_t should_use_irsensor_5;
 
 
 PID_process_t *pPID_1, *pPID_2, *pPID_3;
@@ -84,6 +93,11 @@ void motion_cs_init(void)
  * -----------------------------------------------------------------------------
  */
 
+void encoder_set_position(int32_t x, int32_t y, int32_t teta) {
+    encoder1_Value = (int32_t)(x*-1.366 + y*-0.366 + teta*-12.0115);
+    encoder2_Value = (int32_t)(x*1 + y*-1 + teta*-12.0115);
+    encoder3_Value = (int32_t)(x*0.366 + y*1.366 + teta*-12.0115);
+}
 
 /* -----------------------------------------------------------------------------
  * Position getters
@@ -249,6 +263,26 @@ void go_to_position_absolute_metric(int32_t x, int32_t y, int32_t teta)
 {
 }
 
+void set_irsensors_for_moving_toward_y_axis(){
+	should_use_irsensor_0 = 1;
+	should_use_irsensor_1 = 1;
+	should_use_irsensor_2 = 0;
+
+	should_use_irsensor_3 = 0;
+	should_use_irsensor_4 = 1;
+	should_use_irsensor_5 = 0;
+}
+
+void deactivate_all_sensors(){
+	should_use_irsensor_0 = 0;
+	should_use_irsensor_1 = 0;
+	should_use_irsensor_2 = 0;
+
+	should_use_irsensor_3 = 0;
+	should_use_irsensor_4 = 0;
+	should_use_irsensor_5 = 0;
+}
+
 /* -----------------------------------------------------------------------------
  * Main Motion Control System Managment Task
  * TODO: handle re-init of the task
@@ -261,16 +295,17 @@ void motion_cs_task(void *pvParameters)
 
   uint16_t timer=0;
   uint16_t timer_delay = 0;
+  uint16_t start_delay = 0;
 
   uint8_t is_yellow = 0;
 
-  uint8_t should_use_irsensor_0 = 0;
-  uint8_t should_use_irsensor_1 = 0;
-  uint8_t should_use_irsensor_2 = 0;
+  should_use_irsensor_0 = 0;
+  should_use_irsensor_1 = 0;
+  should_use_irsensor_2 = 0;
 
-  uint8_t should_use_irsensor_3 = 0;
-  uint8_t should_use_irsensor_4 = 0;
-  uint8_t should_use_irsensor_5 = 0;
+  should_use_irsensor_3 = 0;
+  should_use_irsensor_4 = 0;
+  should_use_irsensor_5 = 0;
 
   is_started = 0;
   is_init = 0;
@@ -323,6 +358,12 @@ void motion_cs_task(void *pvParameters)
 		  {
 			  led_set_color(HB_LED_BLUE);
 			  is_init = 1;
+
+			  if(ENDSTOP5_VALUE == IS_YELLOW) {
+				  is_yellow = 1;
+			  } else {
+				  is_yellow = 0;
+			  }
 		  }
 	  }
 
@@ -353,71 +394,64 @@ void motion_cs_task(void *pvParameters)
 	  if(timer == 0) {
 		  go_to_position_relative_metric(0, 0, 0);
 	  }
-	  if(timer == (5000/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  //go out of departure area
+	  if(timer == ((100+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  should_use_irsensor_0 = is_yellow ? 1 : 0; //sould not detect wall
-		  should_use_irsensor_1 = is_yellow ? 0 : 1;
-		  should_use_irsensor_2 = 0;
+		  set_irsensors_for_moving_toward_y_axis();
 
-		  should_use_irsensor_3 = 0;
-		  should_use_irsensor_4 = 1;
-		  should_use_irsensor_5 = 0;
+		  //sould not detect wall
+		  should_use_irsensor_0 = is_yellow ? 1 : 0;
+		  should_use_irsensor_1 = is_yellow ? 0 : 1;
+
 		  go_to_position_relative_metric(0, 900, 0);
 	  }
-	  if(timer == (9000/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  //turn 90degrees
+	  if(timer == ((4000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  should_use_irsensor_0 = 0;
-		  should_use_irsensor_1 = 0;
-		  should_use_irsensor_2 = 0;
+		  deactivate_all_sensors();
 
-		  should_use_irsensor_3 = 0;
-		  should_use_irsensor_4 = 0;
-		  should_use_irsensor_5 = 0;
-
-		  go_to_position_relative_metric(0, 900, is_yellow ? -45 : 45);
+		  go_to_position_relative_metric(0, 900, is_yellow ? -90 : 90);
 	  }
-	  if(timer == (11000/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  //fix position using wall
+	  if(timer == ((6000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  should_use_irsensor_0 = 1;
-		  should_use_irsensor_1 = 1;
-		  should_use_irsensor_2 = 0;
+		  //encoder_set_position(0, 900, 0);
 
-		  should_use_irsensor_3 = 0;
-		  should_use_irsensor_4 = 1;
-		  should_use_irsensor_5 = 0;
-		  go_to_position_relative_metric(0, 900+1500, is_yellow ? -45 : 45);
-	  }
+		  set_irsensors_for_moving_toward_y_axis();
 
-	  /*if(timer == 0)
-	  {
-		  should_use_irsensor_0 = 0;
-		  should_use_irsensor_1 = 1;
-		  should_use_irsensor_2 = 0;
-		  go_to_position_relative_metric(500, 200, 0);
+		  go_to_position_relative_metric(0, 0, is_yellow ? -90 : 90);
 	  }
-	  if(timer == (10000/MOTION_CONTROL_PERIOD_TICKS)) // 10s
+	  //go near tube
+	  if(timer == ((8000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  should_use_irsensor_0 = 1;
-		  should_use_irsensor_1 = 0;
-		  should_use_irsensor_2 = 0;
-		  go_to_position_relative_metric(-200, 500, 0);
-	  }
+		  encoder_set_position(0, 0, 0);
 
-	  if(timer == (20000/MOTION_CONTROL_PERIOD_TICKS)) // 20s
+		  set_irsensors_for_moving_toward_y_axis();
+
+		  go_to_position_relative_metric(0, 300, 0);
+	  }
+	  //turn left
+	  if(timer == ((10000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  should_use_irsensor_0 = 0;
-		  should_use_irsensor_1 = 0;
-		  should_use_irsensor_2 = 1;
-		  go_to_position_relative_metric(-200, -500, 0);
+		  encoder_set_position(0, 0, 0);
+
+		  set_irsensors_for_moving_toward_y_axis();
+
+		  go_to_position_relative_metric(0, 0, is_yellow ? 90 : -90);
+	  }
+	  //turn around tube
+	  if(timer == ((12000+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  encoder_set_position(0, 0, 0);
+
+		  set_irsensors_for_moving_toward_y_axis();
+
+		  go_to_position_relative_metric(0, 250, 270);
 	  }
 
-	  if(timer == (30000/MOTION_CONTROL_PERIOD_TICKS)) // 30s
-	  {
-		  should_use_irsensor_0 = 0;
-		  should_use_irsensor_1 = 0;
-		  should_use_irsensor_2 = 0;
-		  go_to_position_relative_metric(-200, -500, 180);
-	  }*/
+	  //
+	  //encoder_set_position(int32_t x, int32_t y, int32_t teta)
+
 
 
 	  //pause the robot when a valid obstacle is detected

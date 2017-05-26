@@ -54,6 +54,10 @@ void hb_init(void)
     hb_endstop_init();
     hb_turret_init();
 
+    hb_pwr_enable(HB_PWR_VP1);
+    hb_pwr_enable(HB_PWR_VP2);
+    hb_pwr_enable(HB_PWR_VP3);
+
     /* Set Interrupt group priority */
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 }
