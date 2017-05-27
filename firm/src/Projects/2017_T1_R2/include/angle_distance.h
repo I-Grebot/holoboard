@@ -1,7 +1,7 @@
 #ifndef _ANGLE_DISTANCE_H_
 #define _ANGLE_DISTANCE_H_
 
-#include "main.h"
+#include <stdint.h>
 
 struct rs_wheels {
 	int32_t wheel_1;

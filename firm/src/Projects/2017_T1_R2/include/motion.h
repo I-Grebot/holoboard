@@ -18,7 +18,7 @@
 #define _MOTION_H_
 
 #include <stdint.h>
-
+#include <stdbool.h>
 
 //#include "aversive.h"
 //#include "pid.h"

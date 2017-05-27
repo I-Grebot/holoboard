@@ -15,6 +15,7 @@
  */
 
 #include "main.h"
+#include "dynamixel.h"
 #include "ir_sensors.h"
 #include "pid.h"
 
@@ -354,7 +355,7 @@ void motion_cs_task(void *pvParameters)
 
   uint16_t timer=0;
   uint16_t timer_delay = 0;
-  uint16_t start_delay = 5000;
+  uint16_t start_delay = 0;
   uint16_t timer_offset = 0;
 
   uint8_t is_yellow = 0;
@@ -421,8 +422,10 @@ void motion_cs_task(void *pvParameters)
 
 			  if(ENDSTOP5_VALUE == IS_YELLOW) {
 				  is_yellow = 1;
+				  dsv_set_led(DXL_LED_YELLOW);
 			  } else {
 				  is_yellow = 0;
+				  dsv_set_led(DXL_LED_BLUE);
 			  }
 		  }
 	  }
@@ -441,7 +444,6 @@ void motion_cs_task(void *pvParameters)
 
 	  vTaskDelayUntil( &xNextWakeTime, MOTION_CONTROL_PERIOD_TICKS);
   }
-  timer_offset = 0;
   for( ;; )
   {
 	//  led_set_mode(HB_LED_BLINK_SLOW);
@@ -451,11 +453,12 @@ void motion_cs_task(void *pvParameters)
 	  //    2/_\0   X is parallel to 2 (</), Y is perpendicular to X
 	  //      1 4
 
-
+	  timer_offset = 0;
       // Manage Robot System
-      rs_update(&robot.cs.rs);
+     // rs_update(&robot.cs.rs);
 
 	  if(timer == 0) {
+		  deactivate_all_sensors();
 		  go_to_position_relative_metric(0, 0, 0);
 		  dsv_open_grabber();
 	  }
@@ -514,7 +517,6 @@ void motion_cs_task(void *pvParameters)
 	  //fix position using wall
 	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
-		  set_limitation_slow();
 		  deactivate_all_sensors();
 
 		  go_to_position_relative_metric(is_yellow ? -100 : 100, 0, is_yellow ? -90 : 90);
@@ -533,6 +535,17 @@ void motion_cs_task(void *pvParameters)
 	  }
 	  timer_offset += 3000;
 
+	  //fix position using wall again
+	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+	  {
+		  set_limitation_normal();
+		  encoder_set_position(0, 0, 0);
+		  deactivate_all_sensors();
+
+		  go_to_position_relative_metric(is_yellow ? 10 : -10,-100,0);
+	  }
+	  timer_offset += 3000;
+
 	  //offset from rocket
 	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
 	  {
@@ -541,7 +554,7 @@ void motion_cs_task(void *pvParameters)
 
 		  deactivate_all_sensors();
 
-		  go_to_position_relative_metric(is_yellow ? 50 : -50, 50, 0);
+		  go_to_position_relative_metric(is_yellow ? 50 : -50, 100, 0);
 	  }
 	  timer_offset += 3000;
 
@@ -550,9 +563,8 @@ void motion_cs_task(void *pvParameters)
 	  {
 		  encoder_set_position(0, 0, 0);
 
-		  set_irsensors_for_moving_toward_y_axis();
-
-		  go_to_position_relative_metric(0, 0, is_yellow ? 45 : -45);
+		  deactivate_all_sensors();
+		  go_to_position_relative_metric(0, 0, is_yellow ? 80 : -80);
 	  }
 	  timer_offset += 1000;
 
@@ -561,9 +573,18 @@ void motion_cs_task(void *pvParameters)
 	  {
 		  encoder_set_position(0, 0, 0);
 
-		  set_irsensors_for_moving_toward_y_axis();
+			should_use_irsensor_0 = 0;
+			should_use_irsensor_1 = 1;
+			should_use_irsensor_2 = 0;
 
-		  go_to_position_relative_metric(0, 1500, 0);
+			should_use_irsensor_3 = 0;
+			should_use_irsensor_4 = 1;
+			should_use_irsensor_5 = 0;
+
+		  PID_Set_limitation(pPID_1,350,75);
+		  PID_Set_limitation(pPID_2,700,75);
+
+		  go_to_position_relative_metric(is_yellow ? -630 : 630, 1360, 0);
 	  }
 	  timer_offset += 4000;
 
@@ -574,7 +595,7 @@ void motion_cs_task(void *pvParameters)
 
 		  activate_all_sensors();
 
-		  go_to_position_relative_metric(0, 0, is_yellow ? -145 : 145);
+		  go_to_position_relative_metric(0, 0, is_yellow ? 120 : -120);
 	  }
 	  timer_offset += 2000;
 
@@ -585,7 +606,7 @@ void motion_cs_task(void *pvParameters)
 
 		  activate_all_sensors();
 
-		  go_to_position_relative_metric(0, -100, 0);
+		  go_to_position_relative_metric(0, -50, 0);
 	  }
 	  timer_offset += 2000;
 
@@ -601,9 +622,9 @@ void motion_cs_task(void *pvParameters)
 	  {
 		  encoder_set_position(0, 0, 0);
 
-		  activate_all_sensors();
+		  deactivate_all_sensors();
 
-		  go_to_position_relative_metric(0, 0, is_yellow ? -30 : 30);
+		  go_to_position_relative_metric(0, 0, is_yellow ? 80 : -80);
 	  }
 	  timer_offset += 1000;
 
@@ -614,24 +635,24 @@ void motion_cs_task(void *pvParameters)
 
 		  set_irsensors_for_moving_toward_y_axis();
 
-		  go_to_position_relative_metric(0, 1300, 0);
+		  go_to_position_relative_metric(is_yellow ? -720 : 720, 1540, 0);
 	  }
 	  timer_offset += 4000;
 
 	  //go near near near near team zone ignoring rocket sided sensor
-	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
-	  {
-		  encoder_set_position(0, 0, 0);
-
-		  set_irsensors_for_moving_toward_y_axis();
-
-		  //sould not detect wall
-		  should_use_irsensor_0 = is_yellow ? 0 : 1;
-		  should_use_irsensor_1 = is_yellow ? 1 : 0;
-
-		  go_to_position_relative_metric(0, 400, 0);
-	  }
-	  timer_offset += 3000;
+//	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)
+//	  {
+//		  encoder_set_position(0, 0, 0);
+//
+//		  set_irsensors_for_moving_toward_y_axis();
+//
+//		  //sould not detect wall
+//		  should_use_irsensor_0 = is_yellow ? 0 : 1;
+//		  should_use_irsensor_1 = is_yellow ? 1 : 0;
+//
+//		  go_to_position_relative_metric(0, 400, 0);
+//	  }
+//	  timer_offset += 3000;
 
 	  //turn 180
 	  if(timer == ((timer_offset+start_delay)/MOTION_CONTROL_PERIOD_TICKS) + timer_delay)

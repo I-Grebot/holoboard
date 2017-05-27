@@ -130,6 +130,8 @@
   */
 #define MOTION_CONTROL_PERIOD_MS      20
 
+ //robot_t robot;
+
 /**
 ********************************************************************************
 **
@@ -172,6 +174,7 @@ uint8_t dsv_flush(uint8_t chan_idx);
 BaseType_t dsv_dump_servo(dxl_servo_t* servo, char* ret, size_t retLength);
 void dsv_open_grabber();
 void dsv_close_grabber();
+void dsv_set_led(uint8_t value);
 
 /* RGB LED */
 BaseType_t led_start(void);

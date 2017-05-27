@@ -1,4 +1,3 @@
-#include "main.h"
 #include "angle_distance.h"
 
 #ifndef _ROBOT_SYSTEM_H_

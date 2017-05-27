@@ -36,7 +36,7 @@ dsv_channel_t dsv_chan2;
 #define MAX_DSV_IN_QUEUE	5
 
 #define XL320_GRABBER_OPEN 		350
-#define XL320_GRABBER_CLOSED 	840
+#define XL320_GRABBER_CLOSED 	860
 
 
 /* Local structures */
@@ -443,12 +443,15 @@ static void OS_DSVTask( void *pvParameters )
 
 void dsv_open_grabber() {
 	dxl_set_position(&servo1,XL320_GRABBER_OPEN);
-	dxl_set_led(&servo1,DXL_LED_BLUE);
 }
 
 void dsv_close_grabber() {
 	dxl_set_position(&servo1,XL320_GRABBER_CLOSED);
-	dxl_set_led(&servo1,DXL_LED_YELLOW);
+	dxl_set_led(&servo1,DXL_LED_RED);
+}
+
+void dsv_set_led(uint8_t value){
+	dxl_set_led(&servo1,value);
 }
 /*
 void DSV_Create(DSV_ControlTypeDef* DSV, uint8_t id, uint16_t min_Position, uint16_t max_Position)

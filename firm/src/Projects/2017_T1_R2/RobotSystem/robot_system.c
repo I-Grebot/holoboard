@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 #include "motion.h"
+#include "robot_system.h"
+#include "angle_distance.h"
 #include "holoboard.h"
 
 
@@ -196,24 +198,6 @@ int32_t rs_get_distance_y(void * data)
 	return distance;
 }
 
-int32_t rs_get_ext_angle(void * data)
-{
-	struct robot_system * rs = data;
-	int32_t angle;
-	
-	angle = rs->pext_prev.angle ;	
-	return angle;
-}
-
-int32_t rs_get_ext_distance(void * data)
-{
-	struct robot_system * rs = data;
-	int32_t distance;
-	
-	distance = rs->pext_prev.distance ;	
-	return distance;
-}
-
 void rs_set_flags(struct robot_system * rs, uint8_t flags)
 {
 	rs->flags = flags;
@@ -231,7 +215,7 @@ void rs_update(void * data)
 	struct rs_wheels wmot;
 	struct rs_polar pmot;
 
-	int32_t delta_angle, delta_distance;
+	int32_t delta_angle, delta_distance_x, delta_distance_y;
 	
 	/* read encoders */
 	wmot.wheel_1 = safe_getencoder(rs->pwm_motor1, rs->pwm_motor1_param);
@@ -239,21 +223,24 @@ void rs_update(void * data)
 	wmot.wheel_3 = safe_getencoder(rs->pwm_motor3, rs->pwm_motor3_param);
 	
 	/* apply gains to each wheel */
-	if (! (rs->flags & RS_IGNORE_MOT_GAIN )) {
+//	if (! (rs->flags & RS_IGNORE_MOT_GAIN )) {
 		wmot.wheel_1 = wmot.wheel_1*rs->wheel1_gain;
 		wmot.wheel_2 = wmot.wheel_2*rs->wheel2_gain;
 		wmot.wheel_3 = wmot.wheel_3*rs->wheel3_gain;
-	}
+//	}
 
 	rs_get_polar_from_wheels(&pmot, &wmot);
 
 	delta_angle = pmot.angle - rs->pmot_prev.angle;
-	delta_distance = pmot.distance - rs->pmot_prev.distance;
+	delta_distance_x = pmot.distance_x - rs->pmot_prev.distance_x;
+	delta_distance_y = pmot.distance_y - rs->pmot_prev.distance_y;
 
 //	vLockEncoderAngle();
 //	vLockEncoderDistance();
 	rs->virtual_encoders.angle += delta_angle;
-	rs->virtual_encoders.distance += delta_distance;
+	rs->virtual_encoders.distance_x += delta_distance_x;
+	rs->virtual_encoders.distance_y += delta_distance_y;
+
 //	vUnlockEncoderAngle();
 //	vUnlockEncoderDistance();
 

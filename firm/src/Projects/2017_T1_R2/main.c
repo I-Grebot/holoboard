@@ -17,8 +17,6 @@
 /* General Header */
 #include "main.h"
 
-robot_t robot;
-
 /**
 ********************************************************************************
 **
@@ -30,7 +28,7 @@ robot_t robot;
 int main( void )
 {
 // Initialize the robot structure
-	memset(&robot, 0, sizeof(robot_t));
+//	memset(&robot, 0, sizeof(robot_t));
 
 	/* HoloBoard Initializations */
    hb_init();
